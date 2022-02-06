@@ -34,7 +34,7 @@ export type InstrumentsSetDataset = Record<InstrumentsKeys, InstrumentDataset>;
 export type Roland808Model = ReturnType<typeof createRoland808Model>;
 export const createRoland808Model = (config?: {
   dataset?: Partial<InstrumentsSetDataset>;
-  bpm?: BPMStep,
+  bpm?: BPMStep;
 }) => {
   const setBPM = createEvent<BPMStep>();
   const tone = createToneInstance();
@@ -49,10 +49,7 @@ export const createRoland808Model = (config?: {
 
   const tapPressed = createEvent();
 
-  const $bpm = restore(
-    setBPM.map((step) => (BPM[step] || defaultBPM) as BPMStep),
-    config?.bpm || defaultBPM
-  );
+  const $bpm = restore(setBPM, config?.bpm || defaultBPM);
   const cycleBPM = createEvent();
 
   const instruments = createInstrumentsSet();
@@ -67,7 +64,21 @@ export const createRoland808Model = (config?: {
   const $dataset = createStore(dataset);
   const $note = createStore(0);
 
-  const lowTumbler = createToggle({initial: true});
+  const lowTumbler = createToggle({ initial: false });
+  const midTumbler = createToggle({ initial: false });
+  const hiTumbler = createToggle({ initial: false });
+  const rimShotTumbler = createToggle({ initial: false });
+  const clapTumbler = createToggle({ initial: false });
+
+  const stop = createEffect(() => Tone.Transport.stop());
+  const start = createEffect(async () => {
+    await Tone.start();
+    Tone.Transport.bpm.value = $bpm.getState();
+    Tone.Transport.start();
+  });
+  const $isRunning = createStore(false)
+    .on(start, () => true)
+    .on(stop, () => false);
 
   const $activeInstrumentPads = combine(
     $dataset,
@@ -80,33 +91,26 @@ export const createRoland808Model = (config?: {
   const $activePadLights = combine(
     $activeInstrumentPads,
     $note,
-    (activePads, note) => {
+    $isRunning,
+    (activePads, note, isRunning) => {
       const copy = [...activePads];
-      copy[note] = 1;
+      if (isRunning) {
+        copy[note] = copy[note] ? 0 : 1;
+      }
       return copy;
     }
   );
 
   const cycleABModes = createEvent();
 
-  const stop = createEffect(() => Tone.Transport.stop());
-  const start = createEffect(async () => {
-    await Tone.start();
-    Tone.Transport.bpm.value = $bpm.getState();
-    Tone.Transport.start();
-  });
-  const $isRunning = createStore(false)
-    .on(start, () => true)
-    .on(stop, () => false);
+  const togglePlay = createEvent();
 
-  const toggle = createEvent();
-
-  guard(sample($isRunning, toggle), {
+  guard(sample($isRunning, togglePlay), {
     filter: Boolean,
     target: stop,
   });
 
-  guard(sample($isRunning, toggle), {
+  guard(sample($isRunning, togglePlay), {
     filter: (v) => !v,
     target: start,
   });
@@ -118,20 +122,39 @@ export const createRoland808Model = (config?: {
 
   $bpm.watch((bpm) => (Tone.Transport.bpm.value = bpm));
 
+  const $substitutedInstruments = combine({
+    lowTom: lowTumbler.value,
+    midTom: midTumbler.value,
+    hiTom: hiTumbler.value,
+    handClap: clapTumbler.value,
+    rimShot: rimShotTumbler.value,
+  } as Partial<Record<InstrumentsKeys, Store<boolean>>>);
+
   const fxPlay = attach({
-    source: { ab: $ab, dataset: $dataset, note: $note },
+    source: {
+      ab: $ab,
+      dataset: $dataset,
+      note: $note,
+      substitutedInstruments: $substitutedInstruments,
+    },
     effect: createEffect(
       (params: {
         time: number;
         dataset: InstrumentsSetDataset;
         ab: AB;
         note: number;
+        substitutedInstruments: Partial<Record<InstrumentsKeys, boolean>>;
       }) => {
         Object.entries(params.dataset).forEach(([key, dataset]) => {
           if (dataset[params.ab]?.[params.note]) {
-            instruments[key as keyof typeof instruments].player.start(
-              params.time
-            );
+            const isInstrumentSubstituted =
+              params.substitutedInstruments[key as InstrumentsKeys];
+            const instrumentKey = (
+              isInstrumentSubstituted
+                ? instrumentSubstitutionMap[key as InstrumentsKeys]
+                : key
+            ) as InstrumentsKeys;
+            instruments[instrumentKey].player.start(params.time);
           }
         });
       }
@@ -208,15 +231,17 @@ export const createRoland808Model = (config?: {
     .on(
       sample({ instrument: $instrument, ab: $ab, note: $note }, tapPressed),
       (dataset, { ab, instrument, note }) => {
-        const noteAdjusted = (note - 1) < 0 ? 0 : note - 1;
+        const noteAdjusted = note - 1 < 0 ? 0 : note - 1;
 
         return {
           ...dataset,
           [instrument]: {
             ...dataset[instrument],
-            [ab]: dataset[instrument][ab]!.map((v, k) => (k === noteAdjusted  ? 1 : v)),
+            [ab]: dataset[instrument][ab]!.map((v, k) =>
+              k === noteAdjusted ? 1 : v
+            ),
           },
-        }
+        };
       }
     );
 
@@ -243,7 +268,6 @@ export const createRoland808Model = (config?: {
   });
 
   Tone.Transport.scheduleRepeat(fxPlay, "16n");
-  Object.assign(window, { instruments, dataset });
 
   return {
     activeInstrument: $instrument,
@@ -258,13 +282,17 @@ export const createRoland808Model = (config?: {
     setBPM,
     start,
     stop,
-    toggle,
+    togglePlay,
     toggleActiveInstrumentPad,
     tone,
     tapPressed,
     currentMode: $currentMode,
     setCurrentMode,
     lowTumbler,
+    midTumbler,
+    hiTumbler,
+    rimShotTumbler,
+    clapTumbler,
     _meta: {
       $ab,
       $abMode,
@@ -342,4 +370,14 @@ const createGenerator = (config: { bpm: Store<number> }) => {
   //@ts-ignore
   start.watch(() => Tone.Transport.start());
   return { start };
+};
+
+const instrumentSubstitutionMap: Partial<
+  Record<InstrumentsKeys, InstrumentsKeys>
+> = {
+  lowTom: "lowConga",
+  midTom: "midConga",
+  hiTom: "hiConga",
+  rimShot: "claves",
+  handClap: "maracas",
 };

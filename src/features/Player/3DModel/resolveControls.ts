@@ -1,4 +1,4 @@
-import { attach, createEffect } from "effector";
+import { attach, createEffect, createEvent } from "effector";
 import * as THREE from "three";
 import {
   ABMode,
@@ -214,13 +214,11 @@ export const createTumblerModel = (object: THREE.Object3D<THREE.Event>) => {
   return { set };
 };
 
-
-export const createControls = (player: Roland808Model) => {
-  const pads = Array.from({ length: 16 }).map((_, k) =>
-    player.toggleActiveInstrumentPad.prepend(() => k)
-  );
-
+export const createControls = (objects: THREE.Object3D[]) => {
+  const padClicked = createEvent<number>();
+  const padsHandlers = objects.map((_, k) => padClicked.prepend(() => k));
   return {
-    pads,
+    padsHandlers,
+    padClicked,
   };
 };

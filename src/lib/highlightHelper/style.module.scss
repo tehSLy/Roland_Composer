@@ -1,0 +1,54 @@
+.name-input-wrapper {
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    padding: 1rem;
+    background-color: white;
+    border-radius: 1rem;
+}
+
+.ui-wrapper {
+    position: fixed;
+    top: 0px;
+    left: 0px;
+    // z-index: -1;
+    user-select: none;
+
+    max-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    min-width: 17rem;
+
+    padding: 0.5rem;
+    background-color: whitesmoke;
+
+    & > * + * {
+        margin-top: 1rem;
+    }
+
+    &, & * {
+        font-family: monospace;
+    }
+}
+
+.selected-item-wrapper {
+    color: grey;
+
+    &[data-active="true"] {
+        color: green;
+    }
+}
+
+.assigned-controls-row {
+    display: flex;
+    justify-content: space-between;
+
+    & + & {
+        margin-top: 0.3rem;
+    }
+}
+
+.buttons-block {
+    display: flex;
+    flex-direction: row;
+}

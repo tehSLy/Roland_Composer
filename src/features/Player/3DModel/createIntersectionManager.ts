@@ -1,7 +1,9 @@
 import { attach, createEffect, createEvent, restore } from "effector";
 import * as THREE from "three";
 
-export const createIntersectionsManager = (config: {camera: THREE.Camera}) => {
+export const createIntersectionsManager = (config: {
+  camera: THREE.Camera;
+}) => {
   const mouseProjection = projectMouse(config.camera);
 
   const setIntersectable = createEvent<THREE.Object3D<THREE.Event>[]>();
@@ -21,6 +23,15 @@ export const createIntersectionsManager = (config: {camera: THREE.Camera}) => {
   const intersected =
     createEvent<THREE.Intersection<THREE.Object3D<THREE.Event>>>();
   const activeElement = restore(intersected, null).reset(resetIntersected);
+
+  const createMutation = <P>(
+    cb: (state: THREE.Object3D[], arg: P) => THREE.Object3D[]
+  ) => {
+    const event = createEvent<P>();
+    $intersectable.on(event, cb);
+
+    return event;
+  };
 
   const render = attach({
     source: $intersectable,
@@ -46,11 +57,18 @@ export const createIntersectionsManager = (config: {camera: THREE.Camera}) => {
     }),
   });
 
-  return { render, activeElement, mouseProjection, setIntersectable };
+  return {
+    render,
+    activeElement,
+    mouseProjection,
+    setIntersectable,
+    createMutation,
+  };
 };
 
-export type IntersectionsManager = ReturnType<typeof createIntersectionsManager>;
-
+export type IntersectionsManager = ReturnType<
+  typeof createIntersectionsManager
+>;
 
 const projectMouse = (camera: THREE.Camera) => {
   const raycaster = new THREE.Raycaster();

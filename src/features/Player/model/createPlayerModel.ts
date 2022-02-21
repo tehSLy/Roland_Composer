@@ -21,7 +21,7 @@ import {
   PlayerMode,
   playerModes,
 } from "../shared/constants";
-import { createInstrumentsSet } from "./createInstruments";
+import { createInstrumentsSet, InstrumentsSet } from "./createInstruments";
 
 export type InstrumentDataset = {
   a?: number[];
@@ -144,7 +144,7 @@ export const createRoland808Model = (config?: {
         ab: AB;
         note: number;
         substitutedInstruments: Partial<Record<InstrumentsKeys, boolean>>;
-      }) => {
+      }) => {        
         Object.entries(params.dataset).forEach(([key, dataset]) => {
           if (dataset[params.ab]?.[params.note]) {
             const isInstrumentSubstituted =
@@ -268,6 +268,24 @@ export const createRoland808Model = (config?: {
   });
 
   Tone.Transport.scheduleRepeat(fxPlay, "16n");
+  console.log(instruments.bassDrum);
+
+  const bassDrumRowNodesModel = createKnobsRowModel({
+    instrument: instruments.bassDrum,
+    nodes: [
+      {
+        handler: (node: GainNode, level: number) =>
+          (node.gain.value = (level / 111) ** 2 * 5), // this is an empirical formula
+      },
+      {
+        handler: (node: Tone.PitchShift, level: number) => {
+          // instruments.bassDrum.player.playbackRate = level/100;
+        }
+      },
+      // (node: ToneNode, level: number) => (node.tone.value = 1 * level),
+      // (node: GainNode, level: number) => (node.gain.value = 1 * level),
+    ],
+  });
 
   return {
     activeInstrument: $instrument,
@@ -293,6 +311,9 @@ export const createRoland808Model = (config?: {
     hiTumbler,
     rimShotTumbler,
     clapTumbler,
+    nodesModels: {
+      bassDrumRowNodesModel,
+    },
     _meta: {
       $ab,
       $abMode,
@@ -364,14 +385,6 @@ const createToneInstance = () => {
   };
 };
 
-const createGenerator = (config: { bpm: Store<number> }) => {
-  config.bpm.watch((bpm) => (Tone.Transport.bpm.value = bpm));
-  const start = createEvent();
-  //@ts-ignore
-  start.watch(() => Tone.Transport.start());
-  return { start };
-};
-
 const instrumentSubstitutionMap: Partial<
   Record<InstrumentsKeys, InstrumentsKeys>
 > = {
@@ -380,4 +393,41 @@ const instrumentSubstitutionMap: Partial<
   hiTom: "hiConga",
   rimShot: "claves",
   handClap: "maracas",
+};
+
+const noop = ()  => void 0;
+
+const createKnobsRowModel = <
+  F extends { handler(node: any, level: number): void; initial?: number },
+  R extends F[]
+>(config: {
+  nodes: R;
+  instrument: InstrumentsSet[InstrumentsKeys];
+}) => {
+  const models = config.instrument.nodes?.map((node, k) =>
+    createKnobModel({
+      node,
+      cb: config.nodes[k]?.handler || noop,
+      initial: config.nodes[k]?.initial,
+    })
+  );
+
+  return {
+    ...models,
+  };
+};
+
+const createKnobModel = <T>(config: {
+  node: T;
+  cb: (node: T, level: number) => void;
+  initial?: number;
+}) => {
+  const setLevel = createEvent<number>();
+  const level = restore(setLevel, config.initial || 50);
+  const fx = createEffect((level: number) => config.cb(config.node, level));
+
+  forward({ from: level, to: fx });
+  fx(level.getState());
+
+  return { level, setLevel, fx };
 };

@@ -33,19 +33,20 @@ export function createInstrument<
     nodesWithDefaults.map(({ key, node }) => [key, node]) || []
   ) as any as { gain: Tone.Gain<"gain"> } & typeof nodes;
 
+  const nodesArray = nodesWithDefaults.map(({ node }) => node) || [];
+
   return {
-    player: player.chain(
-      ...(nodesWithDefaults.map(({ node }) => node) || []),
-      Tone.Destination
-    ),
-    nodes,
+    player: player.chain(...nodesArray, Tone.Destination),
+    nodes: nodesArray,
     nodesMap,
   };
 }
 
 export const createInstrumentsSet = () => {
   const instruments = {
-    bassDrum: createInstrument(BD, []),
+    bassDrum: createInstrument(BD, [
+      { key: "pitchshift", node: new Tone.PitchShift() },
+    ]),
     cowBell: createInstrument(CB, []),
     closedHat: createInstrument(CH, []),
     claves: createInstrument(CL, []),
@@ -65,3 +66,5 @@ export const createInstrumentsSet = () => {
 
   return instruments;
 };
+
+export type InstrumentsSet = ReturnType<typeof createInstrumentsSet>;

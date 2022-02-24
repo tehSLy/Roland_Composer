@@ -97148,8 +97148,7 @@ const dragManager = (0, createDragManager_1.createDragManager)({
 const clickManager = (0, createClickManager_1.createClickManager)({
   intersectionsManager
 });
-const controlsModel = (0, createControlsModel_1.createControlsModel)(); // const highlightHelper = createHighlightHelper({ camera });
-
+const controlsModel = (0, createControlsModel_1.createControlsModel)();
 const player = (0, model_1.createRoland808Model)({
   dataset: {
     bassDrum: {
@@ -97166,7 +97165,6 @@ const player = (0, model_1.createRoland808Model)({
     }
   }
 });
-console.log(player);
 (0, createDragManager_1.disableCameraControlsUponDrag)({
   dragManager,
   cameraControls

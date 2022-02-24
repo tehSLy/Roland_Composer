@@ -1,0 +1,15 @@
+body {
+    overflow: hidden;
+    width: 100vw;
+    height: 100vh;
+}
+
+.activeElement {
+    position: fixed;
+    top: 0px;
+    left: 0px;
+    padding: 1em;
+    background-color: white;
+}
+
+/*# sourceMappingURL=/style.985d7cce.css.map */

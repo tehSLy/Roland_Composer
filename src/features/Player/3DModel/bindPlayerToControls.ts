@@ -1,10 +1,16 @@
 import { Effect, Event, forward, Store } from "effector";
+import { Mesh } from "three";
 import { ControlsObjects } from ".";
 import { Roland808Model } from "../model/createPlayerModel";
+import { InstrumentsSet } from "../model/instruments";
 import { activeLightMaterial } from "../shared/ActiveLightMaterial";
 import { BPM, instrumentsChain, playerModes } from "../shared/constants";
 import { ClickManager } from "./createClickManager";
-import { ControlsModel } from "./createControlsModel";
+import {
+  ControlsModel,
+  KnobsRowModel,
+  TumblerModel,
+} from "./createControlsModel";
 import { DragManager } from "./createDragManager";
 
 export const bindPlayerToControls = ({
@@ -44,26 +50,6 @@ export const bindPlayerToControls = ({
     handler: player.setCurrentMode,
     threshold: 50,
   });
- 
-  dragManager.registerRangeDragControl({
-    object: controls.bassDrumRow[0],
-    handler: player.nodesModels.bassDrumRowNodesModel[0].setLevel,
-    range: [0, 100],
-    resolveCache: () => player.nodesModels.bassDrumRowNodesModel[0].level.getState(),
-    threshold: 10
-  });
-
-  dragManager.registerRangeDragControl({
-    object: controls.bassDrumRow[1],
-    handler: player.nodesModels.bassDrumRowNodesModel[1].setLevel,
-    range: [0, 100],
-    resolveCache: () => player.nodesModels.bassDrumRowNodesModel[1].level.getState(),
-    threshold: 10
-  })
-
-  console.log(controls.bassDrumRow[0]);
-  
-
 
   bindStoreToControlModel({
     source: player._meta.$abMode,
@@ -85,35 +71,103 @@ export const bindPlayerToControls = ({
     target: controlsModel.model.modeSelector.setMode,
   });
 
-  bindStoreToControlModel({
-    source: player.lowTumbler.value,
-    target: controlsModel.model.lowTumbler.set,
+  bindInstrument({
+    clickManager,
+    dragManager,
+    instrument: player.instruments.bassDrum,
+    knobsRow: controls.bassDrumRow,
+    knobsRowModel: controlsModel.model.bassDrumKnobs,
   });
-
-  bindStoreToControlModel({
-    source: player.midTumbler.value,
-    target: controlsModel.model.midTumbler.set,
+  bindInstrument({
+    clickManager,
+    dragManager,
+    instrument: player.instruments.snareDrum,
+    knobsRow: controls.snareDrumRow,
+    knobsRowModel: controlsModel.model.snareDrumsKnobs,
   });
-
-  bindStoreToControlModel({
-    source: player.hiTumbler.value,
-    target: controlsModel.model.hiTumbler.set,
+  bindInstrument({
+    clickManager,
+    dragManager,
+    instrument: player.instruments.lowTom,
+    knobsRow: controls.lowTomRow,
+    knobsRowModel: controlsModel.model.lowTomKnobs,
+    tumbler: {
+      model: controlsModel.model.lowTumbler,
+      object: controls.lowTumbler,
+    },
   });
-
-  bindStoreToControlModel({
-    source: player.clapTumbler.value,
-    target: controlsModel.model.clapTumbler.set,
+  bindInstrument({
+    clickManager,
+    dragManager,
+    instrument: player.instruments.midTom,
+    knobsRow: controls.midTomRow,
+    knobsRowModel: controlsModel.model.midTomKnobs,
+    tumbler: {
+      model: controlsModel.model.midTumbler,
+      object: controls.midTumbler,
+    },
   });
-
-  bindStoreToControlModel({
-    source: player.rimShotTumbler.value,
-    target: controlsModel.model.rimShotTumbler.set,
+  bindInstrument({
+    clickManager,
+    dragManager,
+    instrument: player.instruments.hiTom,
+    knobsRow: controls.hiTomRow,
+    knobsRowModel: controlsModel.model.hiTomKnobs,
+    tumbler: {
+      model: controlsModel.model.hiTumbler,
+      object: controls.hiTumbler,
+    },
   });
-
-  bindStoreToControlModel({
-    source: player.nodesModels.bassDrumRowNodesModel[0].level,
-    target: controlsModel.model.bassDrumKnobs[0].set
-  })
+  bindInstrument({
+    clickManager,
+    dragManager,
+    instrument: player.instruments.rimShot,
+    knobsRow: controls.rimShotRow,
+    knobsRowModel: controlsModel.model.rimShotKnobs,
+    tumbler: {
+      model: controlsModel.model.rimShotTumbler,
+      object: controls.rimShotTumbler,
+    },
+  });
+  bindInstrument({
+    clickManager,
+    dragManager,
+    instrument: player.instruments.handClap,
+    knobsRow: controls.clapRow,
+    knobsRowModel: controlsModel.model.clapKnobs,
+    tumbler: {
+      model: controlsModel.model.clapTumbler,
+      object: controls.clapTumbler,
+    },
+  });
+  bindInstrument({
+    clickManager,
+    dragManager,
+    instrument: player.instruments.cowBell,
+    knobsRow: controls.cowbellRow,
+    knobsRowModel: controlsModel.model.cowbellKnobs,
+  });
+  bindInstrument({
+    clickManager,
+    dragManager,
+    instrument: player.instruments.cymbal,
+    knobsRow: controls.cymbalRow,
+    knobsRowModel: controlsModel.model.cymbalKnobs,
+  });
+  bindInstrument({
+    clickManager,
+    dragManager,
+    instrument: player.instruments.openHihat,
+    knobsRow: controls.openHihatRow,
+    knobsRowModel: controlsModel.model.openHihatKnobs,
+  });
+  bindInstrument({
+    clickManager,
+    dragManager,
+    instrument: player.instruments.closedHat,
+    knobsRow: controls.closedHihatRow,
+    knobsRowModel: controlsModel.model.closedHihatKnobs,
+  });
 
   forward({
     from: controlsModel.model.padControls.padClicked,
@@ -128,11 +182,6 @@ export const bindPlayerToControls = ({
   clickManager.register(controls.ABModeSelector, player.cycleABModes);
   clickManager.register(controls.clearTrackButton, player.clearButtonPressed);
   clickManager.register(controls.tapButton, player.tapPressed);
-  clickManager.register(controls.lowTumbler, player.lowTumbler.toggle);
-  clickManager.register(controls.midTumbler, player.midTumbler.toggle);
-  clickManager.register(controls.hiTumbler, player.hiTumbler.toggle);
-  clickManager.register(controls.rimShotTumbler, player.rimShotTumbler.toggle);
-  clickManager.register(controls.clapTumbler, player.clapTumbler.toggle);
 
   const lightsMaterialCache = controls.padsLights.map((obj) => obj.material);
   const abLightsMaterialCache = [
@@ -165,4 +214,59 @@ const bindStoreToControlModel = <T>(config: {
 }) => {
   forward({ from: config.source, to: config.target });
   config.target(config.source.getState());
+};
+
+const bindInstrument = ({
+  dragManager,
+  instrument,
+  knobsRow,
+  tumbler,
+  knobsRowModel,
+  clickManager,
+}: {
+  instrument: InstrumentsSet[keyof InstrumentsSet];
+  knobsRow: Mesh[];
+  knobsRowModel: KnobsRowModel["models"];
+  tumbler?: {
+    object: Mesh;
+    model: TumblerModel["model"];
+  };
+  dragManager: DragManager;
+  clickManager: ClickManager;
+}) => {
+  dragManager.registerRangeDragControl({
+    object: knobsRow[0],
+    handler: instrument.setVolume,
+    range: [0, 100],
+    resolveCache: () => instrument.volume.getState(),
+    threshold: 10,
+  });
+
+  bindStoreToControlModel({
+    source: instrument.volume,
+    target: knobsRowModel[0].set,
+  });
+
+  for (let i = 0; i < instrument._meta.additionalKnobsCount; i++) {
+    dragManager.registerSteppedDragControl({
+      object: knobsRow[i + 1],
+      handler: (level: number) => instrument.setKnob({ id: i, level }),
+      resolveCache: () => instrument.knobs.getState()[i],
+      dictionary: [0, 1, 2, 3, 4],
+    });
+
+    bindStoreToControlModel({
+      source: instrument.knobs.map((knobs) => knobs[i]),
+      target: knobsRowModel[i + 1].set,
+    });
+  }
+
+  if (tumbler) {
+    clickManager.register(tumbler.object, instrument.togglePrefix);
+    instrument.isMainInstrumentToggled.watch(console.log);
+    bindStoreToControlModel({
+      source: instrument.isMainInstrumentToggled,
+      target: tumbler.model.set,
+    });
+  }
 };

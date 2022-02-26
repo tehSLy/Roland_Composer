@@ -8,14 +8,14 @@ export const createClickManager = ({ intersectionsManager }: Config) => {
   const clickHandlersMap = new Map();
   const onMouseClick = attach({
     source: intersectionsManager.activeElement as Store<
-      THREE.Intersection<THREE.Object3D<THREE.Event>>
+      THREE.Object3D<THREE.Event>
     >,
     effect: createEffect(
       (params: {
-        activeElement: THREE.Intersection<THREE.Object3D<THREE.Event>>;
+        activeElement: THREE.Object3D<THREE.Event>;
         event: MouseEvent;
       }) => {
-        const handler = clickHandlersMap.get(params.activeElement.object);
+        const handler = clickHandlersMap.get(params.activeElement);
 
         if (!handler) {
           return;
@@ -33,6 +33,5 @@ export const createClickManager = ({ intersectionsManager }: Config) => {
       clickHandlersMap.set(obj, handler),
   };
 };
-
 
 export type ClickManager = ReturnType<typeof createClickManager>;

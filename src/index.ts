@@ -13,7 +13,6 @@ import {
 import { createRoland3DModel } from "./features/Player/3DModel/Roland808";
 import { createRoland808Model } from "./features/Player/model";
 import { createScene } from "./features/Scene/Scene";
-import { createHighlightHelper } from "./lib/highlightHelper/highlightHelper";
 import { appInit } from "./model";
 
 const { scene, camera, ticker, cameraControls } = createScene();
@@ -23,7 +22,6 @@ const intersectionsManager = createIntersectionsManager({ camera });
 const dragManager = createDragManager({ intersectionsManager });
 const clickManager = createClickManager({ intersectionsManager });
 const controlsModel = createControlsModel();
-// const highlightHelper = createHighlightHelper({ camera });
 const player = createRoland808Model({
   dataset: {
     bassDrum: {

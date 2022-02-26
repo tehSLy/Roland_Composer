@@ -76,8 +76,56 @@ export const createControlsModel = () => {
   });
 
   const bassDrumKnobsRowModel = createKnobsRowModel({
-    knobsCount: 3,
+    additionalKnobsCount: 2,
     offset: [0, 0, -3.3],
+  });
+
+  const snareDrumsKnobsRowModel = createKnobsRowModel({
+    additionalKnobsCount: 2,
+    offset: [-3.5, 0, 0],
+  });
+
+  const lowTomKnobsRowModel = createKnobsRowModel({
+    additionalKnobsCount: 1,
+    offset: [-3.4, 0],
+  });
+
+  const midTomKnobsRowModel = createKnobsRowModel({
+    additionalKnobsCount: 1,
+    offset: [-3.4, 0],
+  });
+
+  const hiTomKnobsRowModel = createKnobsRowModel({
+    additionalKnobsCount: 1,
+    offset: [-3.4, 0],
+  });
+
+  const rimShotTomKnobsRowModel = createKnobsRowModel({
+    additionalKnobsCount: 1,
+    offset: [-3.4, 0],
+  });
+
+  const clapKnobsRowModel = createKnobsRowModel({
+    additionalKnobsCount: 1,
+    offset: [-3.4, 0],
+  });
+
+  const cymbalKnobsRowModel = createKnobsRowModel({
+    additionalKnobsCount: 2,
+    offset: [-3.4, -1.7, 0],
+  });
+
+  const cowbellKnobsRowModel = createKnobsRowModel({
+    additionalKnobsCount: 1,
+    offset: [-3.4, 0],
+  });
+  const openHihatKnobsRowModel = createKnobsRowModel({
+    additionalKnobsCount: 1,
+    offset: [-3.4, -3.5],
+  });
+  const closedHihatKnobsRowModel = createKnobsRowModel({
+    additionalKnobsCount: 1,
+    offset: [-3.4, 0],
   });
 
   const bind = (controls: ControlsObjects) => {
@@ -91,6 +139,16 @@ export const createControlsModel = () => {
     instrumentSelectorModel.bind(controls.instrumentSelector);
     abSelectorModel.bind(controls.ABModeSelector);
     bassDrumKnobsRowModel.bind(controls.bassDrumRow);
+    snareDrumsKnobsRowModel.bind(controls.snareDrumRow);
+    lowTomKnobsRowModel.bind(controls.lowTomRow);
+    midTomKnobsRowModel.bind(controls.midTomRow);
+    hiTomKnobsRowModel.bind(controls.hiTomRow);
+    rimShotTomKnobsRowModel.bind(controls.rimShotRow);
+    clapKnobsRowModel.bind(controls.clapRow);
+    cymbalKnobsRowModel.bind(controls.cymbalRow);
+    cowbellKnobsRowModel.bind(controls.cowbellRow);
+    openHihatKnobsRowModel.bind(controls.openHihatRow);
+    closedHihatKnobsRowModel.bind(controls.closedHihatRow);
   };
 
   return {
@@ -100,12 +158,24 @@ export const createControlsModel = () => {
       hiTumbler: hiTumblerModel.model,
       rimShotTumbler: rimShotTumblerModel.model,
       clapTumbler: clapTumblerModel.model,
+
       padControls: padControlsModel,
       abSelector: abSelectorModel.model,
       instrumentSelector: instrumentSelectorModel.model,
       bpmSelector: bpmSelectorModel.model,
       modeSelector: modeSelectorModel.model,
+
       bassDrumKnobs: bassDrumKnobsRowModel.models,
+      snareDrumsKnobs: snareDrumsKnobsRowModel.models,
+      lowTomKnobs: lowTomKnobsRowModel.models,
+      midTomKnobs: midTomKnobsRowModel.models,
+      hiTomKnobs: hiTomKnobsRowModel.models,
+      rimShotKnobs: rimShotTomKnobsRowModel.models,
+      clapKnobs: clapKnobsRowModel.models,
+      cowbellKnobs: cowbellKnobsRowModel.models,
+      cymbalKnobs: cymbalKnobsRowModel.models,
+      openHihatKnobs: openHihatKnobsRowModel.models,
+      closedHihatKnobs: closedHihatKnobsRowModel.models,
     },
     bind,
   };
@@ -202,9 +272,11 @@ const tumblerPositionsMap = {
 export const createTumblerModel = () =>
   createBindableModelFactory({
     handler: (object, isOn: boolean) =>
-      object.position.setX(tumblerPositionsMap[isOn as any]),
+      object.position.setX(tumblerPositionsMap[!isOn as any]),
     model: (fx) => ({ set: fx }),
   });
+
+export type TumblerModel = ReturnType<typeof createTumblerModel>;
 
 export const createPadControlsModel = () => {
   const padClicked = createEvent<number>();
@@ -219,12 +291,20 @@ export const createPadControlsModel = () => {
 };
 
 export const createKnobsRowModel = <C extends 1 | 2 | 3>(config: {
-  knobsCount: C;
-  offset: [number, number, number];
+  additionalKnobsCount: C;
+  offset: number[];
 }) => {
-  const models = Array.from({ length: config.knobsCount }).map((_, k) =>
-    createKnobModel({ offset: config.offset[k] })
-  );
+  const volumeKnobModel = createKnobModel({
+    offset: config.offset[0],
+    steps: 100,
+  });
+
+  const models = [
+    volumeKnobModel,
+    ...Array.from({ length: config.additionalKnobsCount }).map((_, k) =>
+      createKnobModel({ offset: config.offset[k + 1], steps: 5 })
+    ),
+  ];
 
   return {
     bind: <T extends THREE.Object3D[] | readonly THREE.Object3D[]>(
@@ -234,12 +314,18 @@ export const createKnobsRowModel = <C extends 1 | 2 | 3>(config: {
   };
 };
 
-export const createKnobModel = (config: { offset: number }) =>
+export type KnobsRowModel = ReturnType<typeof createKnobsRowModel>;
+
+export const createKnobModel = (config: { offset: number; steps: number }) =>
   createBindableModelFactory({
     handler: (object, level: number) => {
       const min = 4.1;
       const max = -1;
-      const multiplier = resolveAngleStep({ from: min, to: max, steps: 100 });
+      const multiplier = resolveAngleStep({
+        from: min,
+        to: max,
+        steps: config.steps,
+      });
 
       object.rotation.set(0, min - multiplier * level + config.offset, 0);
     },

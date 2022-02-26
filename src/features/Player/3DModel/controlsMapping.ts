@@ -20,7 +20,7 @@ export const controlsMapping = {
   rimShotRow: ["UVFinal2018"],
   clapRow: ["UVFinal2019"],
   cowbellRow: ["UVFinal2020"],
-  cymballRow: ["UVFinal2021", "UVFinal2024", "UVFinal2026"],
+  cymbalRow: ["UVFinal2021", "UVFinal2024", "UVFinal2026"],
   openHihatRow: ["UVFinal2022", "UVFinal2025"],
   closedHihatRow: ["UVFinal2023"],
   bassDrumRow: ["UVFinal2006", "UVFinal2007", "UVFinal2010"],

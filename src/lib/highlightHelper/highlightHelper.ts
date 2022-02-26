@@ -39,14 +39,14 @@ export const createHighlightHelper = ({ camera }) => {
     clock: mouseClicked,
     source: activeElement,
     target: item,
-    fn: (intersection) => intersection?.object || null,
+    fn: (object) => object || null,
   });
 
   sample({
     clock: mouseClicked,
     source: activeElement,
     target: itemSelected,
-    fn: (intersection) => intersection?.object || null,
+    fn: (object) => object || null,
   });
 
   const { assignedControls } = createUI({

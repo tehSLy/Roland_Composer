@@ -1,4 +1,11 @@
-import { attach, createEffect, createStore, guard, Store } from "effector";
+import {
+  attach,
+  createEffect,
+  createStore,
+  Effect,
+  guard,
+  Store,
+} from "effector";
 import throttle from "lodash.throttle";
 import * as THREE from "three";
 import { Vector2 } from "three";
@@ -7,7 +14,7 @@ import { IntersectionsManager } from "./createIntersectionManager";
 export type DragHandlers = {
   onStart(data: {
     event: MouseEvent;
-    activeElement: THREE.Intersection<THREE.Object3D<THREE.Event>>;
+    activeElement: THREE.Object3D<THREE.Event>;
   }): void;
   onDrag(distance: number): void;
   onEnd(): void;
@@ -33,14 +40,14 @@ export const createDragManager = ({
   const $isDragging = createStore(false);
   const onMouseDown = attach({
     source: intersectionsManager.activeElement as Store<
-      THREE.Intersection<THREE.Object3D<THREE.Event>>
+      THREE.Object3D<THREE.Event>
     >,
     effect: createEffect(
       (params: {
-        activeElement: THREE.Intersection<THREE.Object3D<THREE.Event>>;
+        activeElement: THREE.Object3D<THREE.Event>;
         event: MouseEvent;
       }) => {
-        const handlers = dragHandlersMap.get(params.activeElement.object);        
+        const handlers = dragHandlersMap.get(params.activeElement);
         return handlers ? { ...handlers, event: params.event } : null;
       }
     ),
@@ -49,18 +56,17 @@ export const createDragManager = ({
 
   const onDragStart = attach({
     source: intersectionsManager.activeElement as Store<
-      THREE.Intersection<THREE.Object3D<THREE.Event>>
+      THREE.Object3D<THREE.Event>
     >,
     effect: createEffect(
       (params: {
-        activeElement: THREE.Intersection<THREE.Object3D<THREE.Event>>;
+        activeElement: THREE.Object3D<THREE.Event>;
         event: MouseEvent;
-        handler: DragHandlers;
       }) => {
         params.event.preventDefault();
         params.event.stopImmediatePropagation();
 
-        const handlers = dragHandlersMap.get(params.activeElement.object)!;
+        const handlers = dragHandlersMap.get(params.activeElement)!;
         handlers.onStart({
           activeElement: params.activeElement,
           event: params.event,
@@ -68,15 +74,12 @@ export const createDragManager = ({
 
         mousePositionCache.set(params.event.x, params.event.y);
 
-        activeElementCache = params.activeElement.object;
+        activeElementCache = params.activeElement;
 
         currentDragHandlerCache = handlers.onDrag;
       }
     ),
-    mapParams: (
-      data: { event: MouseEvent; handler: DragHandlers },
-      activeElement
-    ) => ({
+    mapParams: (data: { event: MouseEvent }, activeElement) => ({
       ...data,
       activeElement,
     }),
@@ -87,7 +90,7 @@ export const createDragManager = ({
     target: onDragStart,
   });
 
-  const onDragDebounced = throttle(onDrag, 100);
+  const onDragDebounced = throttle(onDrag as Effect<any, any, Error>, 100);
 
   $isDragging.on(onDragStart, () => true).on(onDragEnd, () => false);
   $isDragging.watch((is) => {

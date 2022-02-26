@@ -29,7 +29,6 @@ export const resolveControls = (object: THREE.Group) => {
 
     result[key] = resolveElement(entry);
   }
-  console.log(result);
 
   return result as ControlsObjects;
 };
@@ -58,7 +57,7 @@ export type ControlsObjects = {
   rimShotRow: [Mesh];
   clapRow: [Mesh];
   cowbellRow: [Mesh];
-  cymballRow: [Mesh, Mesh, Mesh];
+  cymbalRow: [Mesh, Mesh, Mesh];
   openHihatRow: [Mesh, Mesh];
   closedHihatRow: [Mesh];
   bassDrumRow: [Mesh, Mesh, Mesh];

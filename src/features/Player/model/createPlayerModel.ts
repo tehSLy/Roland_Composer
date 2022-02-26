@@ -17,11 +17,12 @@ import {
   ABMode,
   BPM,
   BPMStep,
+  instrumentsChain,
   InstrumentsKeys,
   PlayerMode,
   playerModes,
 } from "../shared/constants";
-import { createInstrumentsSet, InstrumentsSet } from "./createInstruments";
+import { createInstrumentsSet, InstrumentsSet } from "./instruments/createInstrumentsSet";
 
 export type InstrumentDataset = {
   a?: number[];
@@ -147,14 +148,7 @@ export const createRoland808Model = (config?: {
       }) => {        
         Object.entries(params.dataset).forEach(([key, dataset]) => {
           if (dataset[params.ab]?.[params.note]) {
-            const isInstrumentSubstituted =
-              params.substitutedInstruments[key as InstrumentsKeys];
-            const instrumentKey = (
-              isInstrumentSubstituted
-                ? instrumentSubstitutionMap[key as InstrumentsKeys]
-                : key
-            ) as InstrumentsKeys;
-            instruments[instrumentKey].player.start(params.time);
+            instruments[key as keyof typeof instruments].play();
           }
         });
       }
@@ -183,13 +177,13 @@ export const createRoland808Model = (config?: {
   });
 
   $instrument.on(cycleInstrument, (instrument) => {
-    const idx = instrumentMap.indexOf(instrument);
+    const idx = instrumentsChain.indexOf(instrument);
 
-    if (idx === -1 || idx + 1 === instrumentMap.length) {
-      return instrumentMap[0];
+    if (idx === -1 || idx + 1 === instrumentsChain.length) {
+      return instrumentsChain[0];
     }
 
-    return instrumentMap[idx + 1];
+    return instrumentsChain[idx + 1];
   });
 
   $ab.on(toggleAB, (state) => (state === "a" ? "b" : "a"));
@@ -268,24 +262,6 @@ export const createRoland808Model = (config?: {
   });
 
   Tone.Transport.scheduleRepeat(fxPlay, "16n");
-  console.log(instruments.bassDrum);
-
-  const bassDrumRowNodesModel = createKnobsRowModel({
-    instrument: instruments.bassDrum,
-    nodes: [
-      {
-        handler: (node: GainNode, level: number) =>
-          (node.gain.value = (level / 111) ** 2 * 5), // this is an empirical formula
-      },
-      {
-        handler: (node: Tone.PitchShift, level: number) => {
-          // instruments.bassDrum.player.playbackRate = level/100;
-        }
-      },
-      // (node: ToneNode, level: number) => (node.tone.value = 1 * level),
-      // (node: GainNode, level: number) => (node.gain.value = 1 * level),
-    ],
-  });
 
   return {
     activeInstrument: $instrument,
@@ -311,9 +287,6 @@ export const createRoland808Model = (config?: {
     hiTumbler,
     rimShotTumbler,
     clapTumbler,
-    nodesModels: {
-      bassDrumRowNodesModel,
-    },
     _meta: {
       $ab,
       $abMode,
@@ -325,20 +298,6 @@ export const createRoland808Model = (config?: {
     },
   };
 };
-
-const instrumentMap: InstrumentsKeys[] = [
-  "bassDrum",
-  "snareDrum",
-  "lowTom",
-  "midTom",
-  "hiTom",
-  "rimShot",
-  "handClap",
-  "cowBell",
-  "cymbal",
-  "openHihat",
-  "closedHat",
-];
 
 const toggleNumber = (v: number) => (v === 0 ? 1 : 0);
 
@@ -385,49 +344,41 @@ const createToneInstance = () => {
   };
 };
 
-const instrumentSubstitutionMap: Partial<
-  Record<InstrumentsKeys, InstrumentsKeys>
-> = {
-  lowTom: "lowConga",
-  midTom: "midConga",
-  hiTom: "hiConga",
-  rimShot: "claves",
-  handClap: "maracas",
-};
+// console.log(createBassDrumInstrument());
 
-const noop = ()  => void 0;
+// const noop = ()  => void 0;
 
-const createKnobsRowModel = <
-  F extends { handler(node: any, level: number): void; initial?: number },
-  R extends F[]
->(config: {
-  nodes: R;
-  instrument: InstrumentsSet[InstrumentsKeys];
-}) => {
-  const models = config.instrument.nodes?.map((node, k) =>
-    createKnobModel({
-      node,
-      cb: config.nodes[k]?.handler || noop,
-      initial: config.nodes[k]?.initial,
-    })
-  );
+// const createKnobsRowModel = <
+//   F extends { handler(node: any, level: number): void; initial?: number },
+//   R extends F[]
+// >(config: {
+//   nodes: R;
+//   instrument: InstrumentsSet[InstrumentsKeys];
+// }) => {
+//   const models = config.instrument.nodes?.map((node, k) =>
+//     createKnobModel({
+//       node,
+//       cb: config.nodes[k]?.handler || noop,
+//       initial: config.nodes[k]?.initial,
+//     })
+//   );
 
-  return {
-    ...models,
-  };
-};
+//   return {
+//     ...models,
+//   };
+// };
 
-const createKnobModel = <T>(config: {
-  node: T;
-  cb: (node: T, level: number) => void;
-  initial?: number;
-}) => {
-  const setLevel = createEvent<number>();
-  const level = restore(setLevel, config.initial || 50);
-  const fx = createEffect((level: number) => config.cb(config.node, level));
+// const createKnobModel = <T>(config: {
+//   node: T;
+//   cb: (node: T, level: number) => void;
+//   initial?: number;
+// }) => {
+//   const setLevel = createEvent<number>();
+//   const level = restore(setLevel, config.initial || 50);
+//   const fx = createEffect((level: number) => config.cb(config.node, level));
 
-  forward({ from: level, to: fx });
-  fx(level.getState());
+//   forward({ from: level, to: fx });
+//   fx(level.getState());
 
-  return { level, setLevel, fx };
-};
+//   return { level, setLevel, fx };
+// };

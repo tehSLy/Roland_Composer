@@ -145,9 +145,12 @@ export const createDragManager = ({
           const threshold = config.threshold || 35;
           const newIdx = Math.round(base - cache - distance / threshold);
 
-          const maxIdx = config.dictionary.length - 1;
-          const resultIdx =
-            base - (newIdx > maxIdx ? maxIdx : newIdx <= 0 ? 0 : newIdx);
+          //TODO: this algo is fucked
+          const b = newIdx % config.dictionary.length;
+          const p = newIdx < 0 ? config.dictionary.length + b : b;
+          const resultIdx = config.dictionary.length - p - 1;
+          
+          console.log({newIdx, resultIdx})
 
           config.handler(config.dictionary[resultIdx]);
         },
@@ -202,6 +205,8 @@ export const createDragManager = ({
     isDragging: $isDragging,
     registerSteppedDragControl,
     registerRangeDragControl,
+    onDragStart,
+    onDragEnd,
   };
 };
 

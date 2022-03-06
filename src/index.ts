@@ -10,6 +10,7 @@ import {
   createDragManager,
   disableCameraControlsUponDrag,
 } from "./features/Player/3DModel/createDragManager";
+import { createObjectHighlightManager } from "./features/Player/3DModel/createObjectHighlightManager";
 import { createRoland3DModel } from "./features/Player/3DModel/Roland808";
 import { createRoland808Model } from "./features/Player/model";
 import { createScene } from "./features/Scene/Scene";
@@ -22,6 +23,7 @@ const intersectionsManager = createIntersectionsManager({ camera });
 const dragManager = createDragManager({ intersectionsManager });
 const clickManager = createClickManager({ intersectionsManager });
 const controlsModel = createControlsModel();
+const highlightManager = createObjectHighlightManager({intersectionsManager, dragManager});
 const player = createRoland808Model({
   dataset: {
     bassDrum: {

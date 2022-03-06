@@ -10,48 +10,6 @@ export const createIntersectionsManager = (config: {
   const setIntersectable = createEvent<THREE.Object3D<THREE.Event>[]>();
   const $intersectable = restore(setIntersectable, []);
 
-  const cloneMaterialCache = new Map<Mesh, Material>();
-  const sourceMaterialCache = new Map<Mesh, Material>();
-
-  let cachedObject: Mesh | null = null;
-
-  const resolveIntersectionMaterial = (obj: Mesh) => {
-    const cached = cloneMaterialCache.get(obj);
-    if (cached) {
-      return cached;
-    }
-
-    const multiplier = 10;
-    const result = obj.material.clone();
-
-    result.color.r = multiplier;
-    result.color.g = multiplier;
-    result.color.b = multiplier;
-
-    sourceMaterialCache.set(obj, obj.material);
-    cloneMaterialCache.set(obj, result);
-    return result;
-  };
-
-  const resolveCachedMaterial = (obj: Mesh) => {
-    return sourceMaterialCache.get(obj);
-  };
-
-  const fxHighlightElement = createEffect((obj: Mesh) => {
-    // Intersection throttles at some point, so it doesn't drop intersections if move mouse too fast
-    if(cachedObject && cachedObject !== obj){
-      fxResetObjectMaterial();
-    }
-    const intersectionMaterial = resolveIntersectionMaterial(obj);
-    obj.material = intersectionMaterial;
-    cachedObject = obj;
-  });
-
-  const fxResetObjectMaterial = createEffect(() => {
-    const cachedMaterial = resolveCachedMaterial(cachedObject!);
-    cachedObject!.material = cachedMaterial!;
-  });
-
   const resetIntersected = createEvent();
   const intersected =
     createEvent<THREE.Intersection<THREE.Object3D<THREE.Event>>>();
@@ -87,16 +45,6 @@ export const createIntersectionsManager = (config: {
         resetIntersected();
       }
     }),
-  });
-
-  guard(activeElement, {
-    filter: Boolean,
-    target: fxHighlightElement,
-  });
-
-  guard(activeElement, {
-    filter: (v) => !v,
-    target: fxResetObjectMaterial,
   });
 
   return {

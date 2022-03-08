@@ -38594,45 +38594,6 @@ const createIntersectionsManager = config => {
   const mouseProjection = projectMouse(config.camera);
   const setIntersectable = (0, effector_1.createEvent)();
   const $intersectable = (0, effector_1.restore)(setIntersectable, []);
-  const cloneMaterialCache = new Map();
-  const sourceMaterialCache = new Map();
-  let cachedObject = null;
-
-  const resolveIntersectionMaterial = obj => {
-    const cached = cloneMaterialCache.get(obj);
-
-    if (cached) {
-      return cached;
-    }
-
-    const multiplier = 10;
-    const result = obj.material.clone();
-    result.color.r = multiplier;
-    result.color.g = multiplier;
-    result.color.b = multiplier;
-    sourceMaterialCache.set(obj, obj.material);
-    cloneMaterialCache.set(obj, result);
-    return result;
-  };
-
-  const resolveCachedMaterial = obj => {
-    return sourceMaterialCache.get(obj);
-  };
-
-  const fxHighlightElement = (0, effector_1.createEffect)(obj => {
-    // Intersection throttles at some point, so it doesn't drop intersections if move mouse too fast
-    if (cachedObject && cachedObject !== obj) {
-      fxResetObjectMaterial();
-    }
-
-    const intersectionMaterial = resolveIntersectionMaterial(obj);
-    obj.material = intersectionMaterial;
-    cachedObject = obj;
-  });
-  const fxResetObjectMaterial = (0, effector_1.createEffect)(() => {
-    const cachedMaterial = resolveCachedMaterial(cachedObject);
-    cachedObject.material = cachedMaterial;
-  });
   const resetIntersected = (0, effector_1.createEvent)();
   const intersected = (0, effector_1.createEvent)();
   const activeElement = (0, effector_1.restore)(intersected.map(intersection => intersection.object), null).reset(resetIntersected);
@@ -38660,14 +38621,6 @@ const createIntersectionsManager = config => {
         resetIntersected();
       }
     })
-  });
-  (0, effector_1.guard)(activeElement, {
-    filter: Boolean,
-    target: fxHighlightElement
-  });
-  (0, effector_1.guard)(activeElement, {
-    filter: v => !v,
-    target: fxResetObjectMaterial
   });
   return {
     render,
@@ -43072,9 +43025,15 @@ const createDragManager = ({
         onDrag: distance => {
           const base = config.dictionary.length - 1;
           const threshold = config.threshold || 35;
-          const newIdx = Math.round(base - cache - distance / threshold);
-          const maxIdx = config.dictionary.length - 1;
-          const resultIdx = base - (newIdx > maxIdx ? maxIdx : newIdx <= 0 ? 0 : newIdx);
+          const newIdx = Math.round(base - cache - distance / threshold); //TODO: this algo is fucked
+
+          const b = newIdx % config.dictionary.length;
+          const p = newIdx < 0 ? config.dictionary.length + b : b;
+          const resultIdx = config.dictionary.length - p - 1;
+          console.log({
+            newIdx,
+            resultIdx
+          });
           config.handler(config.dictionary[resultIdx]);
         },
         onEnd: () => {}
@@ -43112,7 +43071,9 @@ const createDragManager = ({
     register,
     isDragging: $isDragging,
     registerSteppedDragControl,
-    registerRangeDragControl
+    registerRangeDragControl,
+    onDragStart,
+    onDragEnd
   };
 };
 
@@ -43123,7 +43084,86 @@ const disableCameraControlsUponDrag = config => {
 };
 
 exports.disableCameraControlsUponDrag = disableCameraControlsUponDrag;
-},{"effector":"node_modules/effector/effector.mjs","lodash.throttle":"node_modules/lodash.throttle/index.js","three":"node_modules/three/build/three.module.js"}],"node_modules/tone/build/esm/version.js":[function(require,module,exports) {
+},{"effector":"node_modules/effector/effector.mjs","lodash.throttle":"node_modules/lodash.throttle/index.js","three":"node_modules/three/build/three.module.js"}],"src/features/Player/3DModel/createObjectHighlightManager.ts":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.createObjectHighlightManager = void 0;
+
+const effector_1 = require("effector");
+
+const createObjectHighlightManager = ({
+  intersectionsManager,
+  dragManager
+}) => {
+  const cloneMaterialCache = new Map();
+  const sourceMaterialCache = new Map();
+  const overrideElement = (0, effector_1.createStore)(null);
+  const elementToHighlight = (0, effector_1.combine)(intersectionsManager.activeElement, overrideElement, (active, override) => {
+    return override || active;
+  });
+  let cachedObject = null;
+
+  const resolveIntersectionMaterial = obj => {
+    const cached = cloneMaterialCache.get(obj);
+
+    if (cached) {
+      return cached;
+    }
+
+    const multiplier = 10;
+    const sourceMaterial = obj.material;
+    const resultMaterial = sourceMaterial.clone();
+    resultMaterial.color.r = multiplier;
+    resultMaterial.color.g = multiplier;
+    resultMaterial.color.b = multiplier / 2;
+    sourceMaterialCache.set(obj, obj.material);
+    cloneMaterialCache.set(obj, resultMaterial);
+    return resultMaterial;
+  };
+
+  const resolveCachedMaterial = obj => {
+    return sourceMaterialCache.get(obj);
+  };
+
+  const fxHighlightElement = (0, effector_1.createEffect)(obj => {
+    // Intersection throttles at some point, so it doesn't drop intersections if move mouse too fast
+    if (cachedObject && cachedObject !== obj) {
+      fxResetObjectMaterial();
+    }
+
+    const intersectionMaterial = resolveIntersectionMaterial(obj);
+    obj.material = intersectionMaterial;
+    cachedObject = obj;
+  });
+  const fxResetObjectMaterial = (0, effector_1.createEffect)(() => {
+    const cachedMaterial = resolveCachedMaterial(cachedObject);
+    cachedObject.material = cachedMaterial;
+  });
+  (0, effector_1.guard)(elementToHighlight, {
+    filter: Boolean,
+    target: fxHighlightElement
+  });
+  (0, effector_1.guard)(elementToHighlight, {
+    filter: v => !v,
+    target: fxResetObjectMaterial
+  });
+  (0, effector_1.sample)({
+    source: intersectionsManager.activeElement,
+    clock: dragManager.onDragStart,
+    target: overrideElement
+  });
+  overrideElement.reset(dragManager.onDragEnd);
+  return {
+    highlightElement: fxHighlightElement,
+    resetHighlight: fxResetObjectMaterial
+  };
+};
+
+exports.createObjectHighlightManager = createObjectHighlightManager;
+},{"effector":"node_modules/effector/effector.mjs"}],"node_modules/tone/build/esm/version.js":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -94779,7 +94819,122 @@ const Buffers = _ToneAudioBuffers.ToneAudioBuffers;
 exports.Buffers = Buffers;
 const BufferSource = _ToneBufferSource.ToneBufferSource;
 exports.BufferSource = BufferSource;
-},{"./core/Global":"node_modules/tone/build/esm/core/Global.js","./classes":"node_modules/tone/build/esm/classes.js","./version":"node_modules/tone/build/esm/version.js","./core/context/ToneAudioBuffer":"node_modules/tone/build/esm/core/context/ToneAudioBuffer.js","./core/context/AudioContext":"node_modules/tone/build/esm/core/context/AudioContext.js","./core/context/ToneAudioBuffers":"node_modules/tone/build/esm/core/context/ToneAudioBuffers.js","./source/buffer/ToneBufferSource":"node_modules/tone/build/esm/source/buffer/ToneBufferSource.js"}],"src/lib/createToggle/createToggle.ts":[function(require,module,exports) {
+},{"./core/Global":"node_modules/tone/build/esm/core/Global.js","./classes":"node_modules/tone/build/esm/classes.js","./version":"node_modules/tone/build/esm/version.js","./core/context/ToneAudioBuffer":"node_modules/tone/build/esm/core/context/ToneAudioBuffer.js","./core/context/AudioContext":"node_modules/tone/build/esm/core/context/AudioContext.js","./core/context/ToneAudioBuffers":"node_modules/tone/build/esm/core/context/ToneAudioBuffers.js","./source/buffer/ToneBufferSource":"node_modules/tone/build/esm/source/buffer/ToneBufferSource.js"}],"src/lib/createTicker/createTicker.ts":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.createAnimationFrameTicker = exports.createTicker = void 0;
+
+const effector_1 = require("effector");
+
+const createInterface = () => {
+  const start = (0, effector_1.createEvent)();
+  const stop = (0, effector_1.createEvent)();
+  const toggle = (0, effector_1.createEvent)();
+  const tick = (0, effector_1.createEvent)();
+  const $isRunning = (0, effector_1.createStore)(false);
+  $isRunning.on(start, () => true).on(stop, () => false).on(toggle, is => !is);
+  return {
+    start,
+    stop,
+    toggle,
+    tick,
+    $isRunning
+  };
+};
+
+const createTicker = ({
+  delay = 100
+}) => {
+  const {
+    $isRunning,
+    start,
+    stop,
+    tick,
+    toggle
+  } = createInterface();
+  const $delay = effector_1.is.store(delay, {
+    name: "$delay",
+    sid: "-rytf0e"
+  }) ? delay : (0, effector_1.createStore)(delay);
+  const fxTick = (0, effector_1.attach)({
+    source: $delay,
+    effect: (0, effector_1.createEffect)(delay => new Promise(rs => setTimeout(rs, delay)))
+  });
+  const setDelay = (0, effector_1.createEvent)();
+  (0, effector_1.guard)(fxTick.done, {
+    filter: $isRunning,
+    target: fxTick
+  });
+  (0, effector_1.forward)({
+    from: start,
+    to: fxTick
+  });
+  (0, effector_1.forward)({
+    from: fxTick,
+    to: tick
+  });
+  $delay.on(setDelay, (_, v) => v);
+  return {
+    start,
+    stop,
+    toggle,
+    tick,
+    isRunning: $isRunning,
+    setDelay
+  };
+};
+
+exports.createTicker = createTicker;
+
+const createAnimationFrameTicker = () => {
+  const {
+    $isRunning,
+    start,
+    stop,
+    tick,
+    toggle
+  } = createInterface();
+  $isRunning.watch(tick, is => is ? requestAnimationFrame(tick) : null);
+  (0, effector_1.forward)({
+    from: start,
+    to: tick
+  });
+  return {
+    start,
+    stop,
+    toggle,
+    tick,
+    isRunning: $isRunning
+  };
+};
+
+exports.createAnimationFrameTicker = createAnimationFrameTicker;
+},{"effector":"node_modules/effector/effector.mjs"}],"src/lib/createTicker/index.ts":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.createTicker = exports.createAnimationFrameTicker = void 0;
+
+var createTicker_1 = require("./createTicker");
+
+Object.defineProperty(exports, "createAnimationFrameTicker", {
+  enumerable: true,
+  get: function () {
+    return createTicker_1.createAnimationFrameTicker;
+  }
+});
+Object.defineProperty(exports, "createTicker", {
+  enumerable: true,
+  get: function () {
+    return createTicker_1.createTicker;
+  }
+});
+},{"./createTicker":"src/lib/createTicker/createTicker.ts"}],"src/lib/createToggle/createToggle.ts":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -95698,6 +95853,8 @@ const effector_1 = require("effector");
 
 const Tone = __importStar(require("tone"));
 
+const createTicker_1 = require("../../../lib/createTicker");
+
 const createToggle_1 = require("../../../lib/createToggle");
 
 const constants_1 = require("../shared/constants");
@@ -95745,11 +95902,9 @@ const createRoland808Model = config => {
   const clapTumbler = (0, createToggle_1.createToggle)({
     initial: false
   });
-  const stop = (0, effector_1.createEffect)(() => Tone.Transport.stop());
+  const stop = (0, effector_1.createEffect)(() => null);
   const start = (0, effector_1.createEffect)(async () => {
     await Tone.start();
-    Tone.Transport.bpm.value = $bpm.getState();
-    Tone.Transport.start();
   });
   const $isRunning = (0, effector_1.createStore)(false).on(start, () => true).on(stop, () => false);
   const $activeInstrumentPads = (0, effector_1.combine)($dataset, $instrument, $ab, (dataset, instrument, ab) => {
@@ -95789,6 +95944,9 @@ const createRoland808Model = config => {
     handClap: clapTumbler.value,
     rimShot: rimShotTumbler.value
   });
+  const generator = (0, createTicker_1.createTicker)({
+    delay: $bpm.map(bpm => 60 / bpm * 1000 / 4)
+  });
   const fxPlay = (0, effector_1.attach)({
     source: {
       ab: $ab,
@@ -95805,9 +95963,7 @@ const createRoland808Model = config => {
         }
       });
     }),
-    mapParams: (time, source) => ({
-      time,
-      ...source
+    mapParams: (_, source) => ({ ...source
     })
   });
   const abToggled = (0, effector_1.guard)((0, effector_1.guard)($note.updates, {
@@ -95903,7 +96059,18 @@ const createRoland808Model = config => {
     filter: $currentMode.map(isNotOneOf("compose", "play", "manualPlay")),
     target: clearPattern
   });
-  Tone.Transport.scheduleRepeat(fxPlay, "16n");
+  (0, effector_1.forward)({
+    from: generator.tick,
+    to: fxPlay
+  });
+  (0, effector_1.forward)({
+    from: start,
+    to: generator.start
+  });
+  (0, effector_1.forward)({
+    from: stop,
+    to: generator.stop
+  });
   return {
     activeInstrument: $instrument,
     activePadLights: $activePadLights,
@@ -96011,7 +96178,7 @@ const createToneInstance = () => {
 //   fx(level.getState());
 //   return { level, setLevel, fx };
 // };
-},{"effector":"node_modules/effector/effector.mjs","tone":"node_modules/tone/build/esm/index.js","../../../lib/createToggle":"src/lib/createToggle/index.ts","../shared/constants":"src/features/Player/shared/constants.ts","./instruments/createInstrumentsSet":"src/features/Player/model/instruments/createInstrumentsSet.ts"}],"src/features/Player/model/index.ts":[function(require,module,exports) {
+},{"effector":"node_modules/effector/effector.mjs","tone":"node_modules/tone/build/esm/index.js","../../../lib/createTicker":"src/lib/createTicker/index.ts","../../../lib/createToggle":"src/lib/createToggle/index.ts","../shared/constants":"src/features/Player/shared/constants.ts","./instruments/createInstrumentsSet":"src/features/Player/model/instruments/createInstrumentsSet.ts"}],"src/features/Player/model/index.ts":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -96027,119 +96194,7 @@ Object.defineProperty(exports, "createRoland808Model", {
     return createPlayerModel_1.createRoland808Model;
   }
 });
-},{"./createPlayerModel":"src/features/Player/model/createPlayerModel.ts"}],"src/lib/createTicker/createTicker.ts":[function(require,module,exports) {
-"use strict";
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.createAnimationFrameTicker = exports.createTicker = void 0;
-
-const effector_1 = require("effector");
-
-const createInterface = () => {
-  const start = (0, effector_1.createEvent)();
-  const stop = (0, effector_1.createEvent)();
-  const toggle = (0, effector_1.createEvent)();
-  const tick = (0, effector_1.createEvent)();
-  const $isRunning = (0, effector_1.createStore)(false);
-  $isRunning.on(start, () => true).on(stop, () => false).on(toggle, is => !is);
-  return {
-    start,
-    stop,
-    toggle,
-    tick,
-    $isRunning
-  };
-};
-
-const createTicker = ({
-  delay = 100
-}) => {
-  const {
-    $isRunning,
-    start,
-    stop,
-    tick,
-    toggle
-  } = createInterface();
-  const $delay = effector_1.is.store(delay, {
-    name: "$delay",
-    sid: "-rytf0e"
-  }) ? delay : (0, effector_1.createStore)(delay);
-  const fxTick = (0, effector_1.attach)({
-    source: $delay,
-    effect: (0, effector_1.createEffect)(delay => new Promise(rs => setTimeout(rs, delay)))
-  });
-  (0, effector_1.guard)(fxTick.done, {
-    filter: $isRunning,
-    target: fxTick
-  });
-  (0, effector_1.forward)({
-    from: start,
-    to: fxTick
-  });
-  (0, effector_1.forward)({
-    from: fxTick,
-    to: tick
-  });
-  return {
-    start,
-    stop,
-    toggle,
-    tick,
-    isRunning: $isRunning
-  };
-};
-
-exports.createTicker = createTicker;
-
-const createAnimationFrameTicker = () => {
-  const {
-    $isRunning,
-    start,
-    stop,
-    tick,
-    toggle
-  } = createInterface();
-  $isRunning.watch(tick, is => is ? requestAnimationFrame(tick) : null);
-  (0, effector_1.forward)({
-    from: start,
-    to: tick
-  });
-  return {
-    start,
-    stop,
-    toggle,
-    tick,
-    isRunning: $isRunning
-  };
-};
-
-exports.createAnimationFrameTicker = createAnimationFrameTicker;
-},{"effector":"node_modules/effector/effector.mjs"}],"src/lib/createTicker/index.ts":[function(require,module,exports) {
-"use strict";
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.createTicker = exports.createAnimationFrameTicker = void 0;
-
-var createTicker_1 = require("./createTicker");
-
-Object.defineProperty(exports, "createAnimationFrameTicker", {
-  enumerable: true,
-  get: function () {
-    return createTicker_1.createAnimationFrameTicker;
-  }
-});
-Object.defineProperty(exports, "createTicker", {
-  enumerable: true,
-  get: function () {
-    return createTicker_1.createTicker;
-  }
-});
-},{"./createTicker":"src/lib/createTicker/createTicker.ts"}],"src/lib/OrbitControls/OrbitControls.ts":[function(require,module,exports) {
+},{"./createPlayerModel":"src/features/Player/model/createPlayerModel.ts"}],"src/lib/OrbitControls/OrbitControls.ts":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -97137,6 +97192,8 @@ const createControlsModel_1 = require("./features/Player/3DModel/createControlsM
 
 const createDragManager_1 = require("./features/Player/3DModel/createDragManager");
 
+const createObjectHighlightManager_1 = require("./features/Player/3DModel/createObjectHighlightManager");
+
 const Roland808_1 = require("./features/Player/3DModel/Roland808");
 
 const model_1 = require("./features/Player/model");
@@ -97162,6 +97219,10 @@ const clickManager = (0, createClickManager_1.createClickManager)({
   intersectionsManager
 });
 const controlsModel = (0, createControlsModel_1.createControlsModel)();
+const highlightManager = (0, createObjectHighlightManager_1.createObjectHighlightManager)({
+  intersectionsManager,
+  dragManager
+});
 const player = (0, model_1.createRoland808Model)({
   dataset: {
     bassDrum: {
@@ -97215,7 +97276,7 @@ model.loadModel.doneData.watch(gltf => {
     dragManager
   });
 });
-},{"effector":"node_modules/effector/effector.mjs","./features/Player/3DModel":"src/features/Player/3DModel/index.ts","./features/Player/3DModel/bindPlayerToControls":"src/features/Player/3DModel/bindPlayerToControls.ts","./features/Player/3DModel/createClickManager":"src/features/Player/3DModel/createClickManager.ts","./features/Player/3DModel/createControlsModel":"src/features/Player/3DModel/createControlsModel.ts","./features/Player/3DModel/createDragManager":"src/features/Player/3DModel/createDragManager.ts","./features/Player/3DModel/Roland808":"src/features/Player/3DModel/Roland808.ts","./features/Player/model":"src/features/Player/model/index.ts","./features/Scene/Scene":"src/features/Scene/Scene.ts","./model":"src/model.ts"}],"node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
+},{"effector":"node_modules/effector/effector.mjs","./features/Player/3DModel":"src/features/Player/3DModel/index.ts","./features/Player/3DModel/bindPlayerToControls":"src/features/Player/3DModel/bindPlayerToControls.ts","./features/Player/3DModel/createClickManager":"src/features/Player/3DModel/createClickManager.ts","./features/Player/3DModel/createControlsModel":"src/features/Player/3DModel/createControlsModel.ts","./features/Player/3DModel/createDragManager":"src/features/Player/3DModel/createDragManager.ts","./features/Player/3DModel/createObjectHighlightManager":"src/features/Player/3DModel/createObjectHighlightManager.ts","./features/Player/3DModel/Roland808":"src/features/Player/3DModel/Roland808.ts","./features/Player/model":"src/features/Player/model/index.ts","./features/Scene/Scene":"src/features/Scene/Scene.ts","./model":"src/model.ts"}],"node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';
 var OldModule = module.bundle.Module;
@@ -97243,7 +97304,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "60447" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "51253" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};

@@ -11,6 +11,7 @@ import {
   Store,
 } from "effector";
 import * as Tone from "tone";
+import { createTicker } from "../../../lib/createTicker";
 import { createToggle } from "../../../lib/createToggle";
 import {
   AB,
@@ -22,7 +23,7 @@ import {
   PlayerMode,
   playerModes,
 } from "../shared/constants";
-import { createInstrumentsSet, InstrumentsSet } from "./instruments/createInstrumentsSet";
+import { createInstrumentsSet } from "./instruments/createInstrumentsSet";
 
 export type InstrumentDataset = {
   a?: number[];
@@ -71,11 +72,9 @@ export const createRoland808Model = (config?: {
   const rimShotTumbler = createToggle({ initial: false });
   const clapTumbler = createToggle({ initial: false });
 
-  const stop = createEffect(() => Tone.Transport.stop());
+  const stop = createEffect(() => null);
   const start = createEffect(async () => {
     await Tone.start();
-    Tone.Transport.bpm.value = $bpm.getState();
-    Tone.Transport.start();
   });
   const $isRunning = createStore(false)
     .on(start, () => true)
@@ -131,6 +130,10 @@ export const createRoland808Model = (config?: {
     rimShot: rimShotTumbler.value,
   } as Partial<Record<InstrumentsKeys, Store<boolean>>>);
 
+  const generator = createTicker({
+    delay: $bpm.map((bpm) => ((60 / bpm) * 1000) / 4),
+  });
+
   const fxPlay = attach({
     source: {
       ab: $ab,
@@ -140,12 +143,11 @@ export const createRoland808Model = (config?: {
     },
     effect: createEffect(
       (params: {
-        time: number;
         dataset: InstrumentsSetDataset;
         ab: AB;
         note: number;
         substitutedInstruments: Partial<Record<InstrumentsKeys, boolean>>;
-      }) => {        
+      }) => {
         Object.entries(params.dataset).forEach(([key, dataset]) => {
           if (dataset[params.ab]?.[params.note]) {
             instruments[key as keyof typeof instruments].play();
@@ -153,7 +155,7 @@ export const createRoland808Model = (config?: {
         });
       }
     ),
-    mapParams: (time: number, source) => ({ time, ...source }),
+    mapParams: (_, source) => ({ ...source }),
   });
 
   const abToggled = guard(
@@ -261,7 +263,9 @@ export const createRoland808Model = (config?: {
     target: clearPattern,
   });
 
-  Tone.Transport.scheduleRepeat(fxPlay, "16n");
+  forward({ from: generator.tick, to: fxPlay });
+  forward({ from: start, to: generator.start });
+  forward({ from: stop, to: generator.stop });
 
   return {
     activeInstrument: $instrument,

@@ -36,7 +36,9 @@ const createInterface = () => {
 
 export const createTicker = ({ delay = 100 }: Config) => {
   const { $isRunning, start, stop, tick, toggle } = createInterface();
-  const $delay = is.store(delay) ? delay : createStore(delay);
+  const $delay = is.store(delay)
+    ? (delay as Store<number>)
+    : (createStore(delay) as Store<number>);
 
   const fxTick = attach({
     source: $delay,
@@ -44,6 +46,8 @@ export const createTicker = ({ delay = 100 }: Config) => {
       (delay: number) => new Promise((rs) => setTimeout(rs, delay))
     ),
   });
+
+  const setDelay = createEvent<number>();
 
   guard(fxTick.done, {
     filter: $isRunning,
@@ -53,12 +57,15 @@ export const createTicker = ({ delay = 100 }: Config) => {
   forward({ from: start, to: fxTick });
   forward({ from: fxTick, to: tick });
 
+  $delay.on(setDelay, (_, v) => v);
+
   return {
     start,
     stop,
     toggle,
     tick,
     isRunning: $isRunning,
+    setDelay,
   };
 };
 

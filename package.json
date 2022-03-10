@@ -9,6 +9,7 @@
     "lodash.debounce": "^4.0.8",
     "lodash.throttle": "^4.1.1",
     "parcel-bundler": "^1.12.5",
+    "patronum": "^1.8.2",
     "save-dev": "0.0.1-security",
     "three": "^0.137.5",
     "tone": "^14.7.77"

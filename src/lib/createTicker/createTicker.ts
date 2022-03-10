@@ -6,6 +6,7 @@ import {
   forward,
   guard,
   is,
+  split,
   Store,
 } from "effector";
 
@@ -47,8 +48,6 @@ export const createTicker = ({ delay = 100 }: Config) => {
     ),
   });
 
-  const setDelay = createEvent<number>();
-
   guard(fxTick.done, {
     filter: $isRunning,
     target: fxTick,
@@ -57,15 +56,12 @@ export const createTicker = ({ delay = 100 }: Config) => {
   forward({ from: start, to: fxTick });
   forward({ from: fxTick, to: tick });
 
-  $delay.on(setDelay, (_, v) => v);
-
   return {
     start,
     stop,
     toggle,
     tick,
     isRunning: $isRunning,
-    setDelay,
   };
 };
 
@@ -84,5 +80,49 @@ export const createAnimationFrameTicker = () => {
     toggle,
     tick,
     isRunning: $isRunning,
+  };
+};
+
+type AdjustableTickerMode = "rAF" | "delay";
+
+type AdjustableTickerConfig = {
+  delay?: number | Store<number>;
+  mode?: AdjustableTickerMode | Store<AdjustableTickerMode>;
+};
+
+export const createAdjustableTicker = ({
+  delay,
+  mode,
+}: AdjustableTickerConfig) => {
+  const delayTicker = createTicker({ delay });
+  const rafTicker = createAnimationFrameTicker();
+  const $mode = mode
+    ? typeof mode === "string"
+      ? createStore(mode)
+      : mode
+    : createStore<AdjustableTickerMode>("rAF");
+
+  const { $isRunning, start, stop, tick, toggle } = createInterface();
+
+  split({
+    source: start,
+    match: $mode,
+    cases: {
+      rAF: rafTicker.start,
+      delay: delayTicker.start,
+    },
+  });
+
+  // restart ticker upon mode change
+  forward({ from: $mode, to: [stop, start] });
+
+  forward({from: stop, to: [delayTicker.stop, rafTicker.stop]});
+
+  return {
+    isRunning: $isRunning,
+    start,
+    stop,
+    tick,
+    toggle,
   };
 };

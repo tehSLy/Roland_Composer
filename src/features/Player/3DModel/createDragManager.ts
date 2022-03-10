@@ -149,8 +149,6 @@ export const createDragManager = ({
           const b = newIdx % config.dictionary.length;
           const p = newIdx < 0 ? config.dictionary.length + b : b;
           const resultIdx = config.dictionary.length - p - 1;
-          
-          console.log({newIdx, resultIdx})
 
           config.handler(config.dictionary[resultIdx]);
         },

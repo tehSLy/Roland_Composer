@@ -38,6 +38,8 @@ export const createRoland808Model = (config?: {
   dataset?: Partial<InstrumentsSetDataset>;
   bpm?: BPMStep;
 }) => {
+  const muteCache: Partial<Record<InstrumentsKeys, number>> = {};
+
   const setBPM = createEvent<BPMStep>();
   const tone = createToneInstance();
   const initialize = createEffect(() => null);
@@ -79,6 +81,15 @@ export const createRoland808Model = (config?: {
   const $isRunning = createStore(false)
     .on(start, () => true)
     .on(stop, () => false);
+
+  const mute = createEffect((key: InstrumentsKeys) => {
+    const currentVolume = instruments[key].volume.getState();
+    if (currentVolume) {
+      muteCache[key] = currentVolume;
+      return instruments[key].setVolume(0);
+    }
+    return instruments[key].setVolume(muteCache[key] || 50);
+  });
 
   const $activeInstrumentPads = combine(
     $dataset,
@@ -289,6 +300,7 @@ export const createRoland808Model = (config?: {
     lowTumbler,
     midTumbler,
     hiTumbler,
+    mute,
     rimShotTumbler,
     clapTumbler,
     _meta: {

@@ -263,7 +263,6 @@ const bindInstrument = ({
 
   if (tumbler) {
     clickManager.register(tumbler.object, instrument.togglePrefix);
-    instrument.isMainInstrumentToggled.watch(console.log);
     bindStoreToControlModel({
       source: instrument.isMainInstrumentToggled,
       target: tumbler.model.set,

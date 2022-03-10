@@ -13,6 +13,7 @@ import {
 import { createObjectHighlightManager } from "./features/Player/3DModel/createObjectHighlightManager";
 import { createRoland3DModel } from "./features/Player/3DModel/Roland808";
 import { createRoland808Model } from "./features/Player/model";
+import { createKeyPressManager } from "./features/Player/model/createKeyPressManager";
 import { createScene } from "./features/Scene/Scene";
 import { appInit } from "./model";
 
@@ -23,7 +24,10 @@ const intersectionsManager = createIntersectionsManager({ camera });
 const dragManager = createDragManager({ intersectionsManager });
 const clickManager = createClickManager({ intersectionsManager });
 const controlsModel = createControlsModel();
-const highlightManager = createObjectHighlightManager({intersectionsManager, dragManager});
+const highlightManager = createObjectHighlightManager({
+  intersectionsManager,
+  dragManager,
+});
 const player = createRoland808Model({
   dataset: {
     bassDrum: {
@@ -39,6 +43,34 @@ const player = createRoland808Model({
       b: [0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0, 1, 0],
     },
   },
+});
+
+const padsMapping = Object.fromEntries(
+  Array.from({ length: 9 }).map((_, v) => [`Digit${v + 1}`, `pad${v + 1}`])
+);
+
+createKeyPressManager({
+  keyMap: {
+    Space: "startStop",
+    KeyV: "toggleGui",
+    ...padsMapping,
+    Digit0: "pad10",
+    Minus: "pad11",
+    Equal: "pad12",
+    "Shift+Digit1": "pad13",
+    "Shift+Digit2": "pad14",
+    "Shift+Digit3": "pad15",
+    "Shift+Digit4": "pad16",
+    KeyI: "modeInstrument",
+    KeyC: "clear",
+    KeyM: "modeMute",
+    KeyL: "modeVolume",
+    ArrowUp: "increase",
+    ArrowDown: "decrease",
+    Enter: "tap",
+    KeyA: "cycleAb"
+  },
+  player,
 });
 
 disableCameraControlsUponDrag({ dragManager, cameraControls });
@@ -59,7 +91,7 @@ model.loadModel.doneData.watch((gltf) => {
   const controls = resolveControls(gltf.scene);
   const { hull, padsLights, aLight, bLight, ...intersectableControls } =
     controls;
-  console.log(controls);
+  // console.log(controls);
 
   intersectionsManager.setIntersectable(gatherObjects(intersectableControls));
   ticker.tick.watch(() => {

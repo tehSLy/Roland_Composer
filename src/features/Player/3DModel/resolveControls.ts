@@ -2,14 +2,6 @@ import * as THREE from "three";
 import { Mesh, Object3D } from "three";
 import { controlsMapping } from "./controlsMapping";
 
-const resolveAngleStep = (params: {
-  from: number;
-  to: number;
-  steps: number;
-}) => {
-  return (params.from - params.to) / (params.steps - 1);
-};
-
 export const resolveControls = (object: THREE.Group) => {
   const children = object.children;
   const result: Record<string, Object3D | Object3D[]> = {};

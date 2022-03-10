@@ -241,7 +241,7 @@ const createMap = <T extends string | number>(config: {
   });
 
 const instrumentMap = createMap({
-  from: 4.6,
+  from: 5.12,
   to: -0.55,
   dictionary: instrumentsChain,
 });

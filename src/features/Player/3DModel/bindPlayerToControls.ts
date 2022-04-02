@@ -1,7 +1,7 @@
 import { Effect, Event, forward, Store } from "effector";
 import { Mesh } from "three";
 import { ControlsObjects } from ".";
-import { Roland808Model } from "../model/createPlayerModel";
+import { DeviceModel } from "../model/createPlayerModel";
 import { InstrumentsSet } from "../model/instruments";
 import { activeLightMaterial } from "../shared/ActiveLightMaterial";
 import { BPM, instrumentsChain, playerModes } from "../shared/constants";
@@ -20,7 +20,7 @@ export const bindPlayerToControls = ({
   clickManager,
   dragManager,
 }: {
-  player: Roland808Model;
+  player: DeviceModel;
   controls: ControlsObjects;
   controlsModel: ControlsModel;
   clickManager: ClickManager;
@@ -36,12 +36,14 @@ export const bindPlayerToControls = ({
       instrumentsChain.indexOf(player.activeInstrument.getState()),
   });
 
-  dragManager.registerSteppedDragControl({
+  dragManager.registerRangeDragControl({
+    range: [65, 215],
     object: controls.bpmSelector,
-    dictionary: BPM,
     handler: player.setBPM,
-    resolveCache: () => BPM.indexOf(player._meta.$bpm.getState()),
+    resolveCache: () => player._meta.$bpm.getState(),
   });
+
+  player.setBPM.watch(console.log)
 
   dragManager.registerSteppedDragControl({
     object: controls.modeSelector,

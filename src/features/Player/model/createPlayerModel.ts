@@ -6,17 +6,17 @@ import {
   createStore,
   forward,
   guard,
-  restore,
   sample,
   Store,
 } from "effector";
+import { clamp } from "lodash";
 import * as Tone from "tone";
+import { NoInfer } from "../../../../types/utils";
 import { createTicker } from "../../../lib/createTicker";
 import { createToggle } from "../../../lib/createToggle";
 import {
   AB,
   ABMode,
-  BPM,
   BPMStep,
   instrumentsChain,
   InstrumentsKeys,
@@ -30,22 +30,65 @@ export type InstrumentDataset = {
   b?: number[];
 };
 
-const defaultBPM = BPM[4];
+// const defaultBPM = BPM[4];
 
 export type InstrumentsSetDataset = Record<InstrumentsKeys, InstrumentDataset>;
-export type Roland808Model = ReturnType<typeof createRoland808Model>;
+
+export type PatternInstrumentDataset = Record<InstrumentsKeys, number[]>;
+
+export type PatternPart = {
+  1?: PatternInstrumentDataset;
+  2?: PatternInstrumentDataset;
+};
+
+export type BasicVariation = {
+  a?: PatternPart;
+  b?: PatternPart;
+};
+
+export type Patterns = Record<number, BasicVariation>;
+
+export type Composition = {
+  patterns: Patterns;
+  composed: number[];
+};
+
+export type DeviceModel = ReturnType<typeof createRoland808Model>;
 export const createRoland808Model = (config?: {
   dataset?: Partial<InstrumentsSetDataset>;
   bpm?: BPMStep;
 }) => {
+  const $currentPattern = createStore(1);
+  const $currentPart = createStore<1 | 2>(1);
+
+  const $audioLoaded = createStore(false);
+
   const muteCache: Partial<Record<InstrumentsKeys, number>> = {};
 
-  const setBPM = createEvent<BPMStep>();
+  const bpmKnob = createRangedKnobModel({
+    range: [65, 215],
+    initial: 120,
+    defaultStep: 4,
+  });
+
+  const setBPM = bpmKnob.setPosition;
   const tone = createToneInstance();
   const initialize = createEffect(() => null);
 
-  const setCurrentMode = createEvent<PlayerMode>();
-  const $currentMode = restore(setCurrentMode, playerModes[1]);
+  const modeKnob = createSteppedKnobModel({
+    dictionary: playerModes,
+    initial: playerModes[1],
+  });
+
+  /**
+   * @deprecated
+   */
+  const setCurrentMode = modeKnob.setPosition;
+
+  /**
+   * @deprecated
+   */
+  const $currentMode = modeKnob.position;
 
   const clearButtonPressed = createEvent();
   const clearTrack = createEvent();
@@ -53,19 +96,38 @@ export const createRoland808Model = (config?: {
 
   const tapPressed = createEvent();
 
-  const $bpm = restore(setBPM, config?.bpm || defaultBPM);
-  const cycleBPM = createEvent();
+  /**
+   * @deprecated
+   */
+  const $bpm = bpmKnob.position;
+  /**
+   * @deprecated
+   */
+  const cycleBPM = bpmKnob.increase;
 
-  const instruments = createInstrumentsSet();
-  const dataset = createDataset({ instruments, initial: config?.dataset });
+  const { instruments, instrumentsLoaded } = createInstrumentsSet();
+  const dataset = createComposition({ instruments, initial: config?.dataset });
+  const instrumentKnob = createSteppedKnobModel({
+    dictionary: instrumentsChain,
+    initial: "bassDrum",
+  });
 
-  const cycleInstrument = createEvent();
-  const setInstrument = createEvent<InstrumentsKeys>();
-  const $instrument = restore(setInstrument, "bassDrum");
+  /**
+   * @deprecated
+   */
+  const cycleInstrument = instrumentKnob.setNext;
+  /**
+   * @deprecated
+   */
+  const setInstrument = instrumentKnob.setPosition;
+  /**
+   * @deprecated
+   */
+  const $instrument = instrumentKnob.position;
 
   const $abMode = createStore<ABMode>("a");
   const $ab = createStore<AB>("a");
-  const $dataset = createStore(dataset);
+  const $composition = createStore(dataset);
   const $note = createStore(0);
 
   const lowTumbler = createToggle({ initial: false });
@@ -83,20 +145,29 @@ export const createRoland808Model = (config?: {
     .on(stop, () => false);
 
   const mute = createEffect((key: InstrumentsKeys) => {
+    //@ts-expect-error
     const currentVolume = instruments[key].volume.getState();
     if (currentVolume) {
       muteCache[key] = currentVolume;
+      //@ts-expect-error
       return instruments[key].setVolume(0);
     }
+    //@ts-expect-error
     return instruments[key].setVolume(muteCache[key] || 50);
   });
 
   const $activeInstrumentPads = combine(
-    $dataset,
+    $composition,
     $instrument,
     $ab,
-    (dataset, instrument, ab) =>
-      dataset[instrument]?.[ab] || Array.from({ length: 16 }).map((_, k) => k)
+    $currentPart,
+    $currentPattern,
+    (composition, instrument, ab, part, pattern) => {
+      console.log(composition);
+      const seq = composition.patterns[pattern][ab]?.[part]?.[instrument];
+      return seq || Array.from({ length: 16 }).map((_, k) => 0);
+      // composition[instrument]?.[ab] || Array.from({ length: 16 }).map((_, k) => k)
+    }
   );
 
   const $activePadLights = combine(
@@ -131,8 +202,6 @@ export const createRoland808Model = (config?: {
 
   const toggleActiveInstrumentPad = createEvent<number>();
 
-  $bpm.watch((bpm) => (Tone.Transport.bpm.value = bpm));
-
   const $substitutedInstruments = combine({
     lowTom: lowTumbler.value,
     midTom: midTumbler.value,
@@ -148,22 +217,34 @@ export const createRoland808Model = (config?: {
   const fxPlay = attach({
     source: {
       ab: $ab,
-      dataset: $dataset,
+      composition: $composition,
       note: $note,
+      part: $currentPart,
+      pattern: $currentPattern,
       substitutedInstruments: $substitutedInstruments,
     },
     effect: createEffect(
       (params: {
-        dataset: InstrumentsSetDataset;
+        composition: Composition;
         ab: AB;
         note: number;
+        pattern: number;
+        part: 1 | 2;
         substitutedInstruments: Partial<Record<InstrumentsKeys, boolean>>;
       }) => {
-        Object.entries(params.dataset).forEach(([key, dataset]) => {
-          if (dataset[params.ab]?.[params.note]) {
-            instruments[key as keyof typeof instruments].play();
+        const sequence =
+          params.composition.patterns[params.pattern][params.ab]?.[params.part];
+        if (!sequence) {
+          console.warn("No seq ");
+        }
+        for (const key in sequence) {
+          const k = key as keyof typeof sequence;
+          const shouldPlay = sequence[k][params.note];
+          if (shouldPlay) {
+            //@ts-expect-error
+            instruments[k].play();
           }
-        });
+        }
       }
     ),
     mapParams: (_, source) => ({ ...source }),
@@ -213,54 +294,44 @@ export const createRoland808Model = (config?: {
       }
     });
 
-  $dataset
+  const $scope = combine({
+    instrument: $instrument,
+    ab: $ab,
+    part: $currentPart,
+    pattern: $currentPattern,
+  });
+
+  $audioLoaded.on(instrumentsLoaded, () => true);
+
+  $composition
     .on(
-      sample(
-        { instrument: $instrument, ab: $ab },
-        toggleActiveInstrumentPad,
-        ({ instrument, ab }, pad) => ({ instrument, pad, ab })
-      ),
-      (dataset, { ab, instrument, pad }) => ({
-        ...dataset,
-        [instrument]: {
-          ...dataset[instrument],
-          [ab]: [...dataset[instrument][ab]!].map((v, k) =>
-            k === pad ? toggleNumber(v) : v
-          ),
-        },
-      })
+      sample($scope, toggleActiveInstrumentPad, (source, pad) => ({
+        ...source,
+        pad,
+      })),
+      (composition, { ab, instrument, pad, part, pattern }) => {
+        const clone = deepClone(composition);
+        //fast inverse
+        clone.patterns[pattern][ab]![part]![instrument][pad] ^= 1;
+        return clone;
+      }
     )
     .on(sample($instrument, clearPattern), (dataset, instrument) => ({
       ...dataset,
-      [instrument]: createInstrumentDataset(),
+      [instrument]: createBasicVariation(),
     }))
-    .on(clearTrack, () => createDataset({ instruments }))
+    .on(clearTrack, () => createComposition({ instruments }))
     .on(
-      sample({ instrument: $instrument, ab: $ab, note: $note }, tapPressed),
-      (dataset, { ab, instrument, note }) => {
+      sample({ scope: $scope, note: $note }, tapPressed),
+      (composition, { scope: { ab, instrument, part, pattern }, note }) => {
         const noteAdjusted = note - 1 < 0 ? 0 : note - 1;
+        const clone = deepClone(composition);
 
-        return {
-          ...dataset,
-          [instrument]: {
-            ...dataset[instrument],
-            [ab]: dataset[instrument][ab]!.map((v, k) =>
-              k === noteAdjusted ? 1 : v
-            ),
-          },
-        };
+        clone.patterns[pattern][ab]![part]![instrument][noteAdjusted] = 1;
+
+        return clone;
       }
     );
-
-  $bpm.on(cycleBPM, (currentBPM) => {
-    const idx = BPM.indexOf(currentBPM);
-
-    if (idx === -1 || idx + 1 === BPM.length) {
-      return BPM[0];
-    }
-
-    return BPM[idx + 1];
-  });
 
   guard(clearButtonPressed, {
     filter: $currentMode.map(isOneOf<PlayerMode>("compose", "play")),
@@ -279,6 +350,7 @@ export const createRoland808Model = (config?: {
   forward({ from: stop, to: generator.stop });
 
   return {
+    isLoaded: $audioLoaded,
     activeInstrument: $instrument,
     activePadLights: $activePadLights,
     cycleABModes,
@@ -303,11 +375,14 @@ export const createRoland808Model = (config?: {
     mute,
     rimShotTumbler,
     clapTumbler,
+    _mode: modeKnob,
+    _bpm: bpmKnob,
+    _instrument: instrumentKnob,
     _meta: {
       $ab,
       $abMode,
       $note,
-      $dataset,
+      $dataset: $composition,
       $bpm,
       toggleAB,
       setABMode,
@@ -315,7 +390,80 @@ export const createRoland808Model = (config?: {
   };
 };
 
-const toggleNumber = (v: number) => (v === 0 ? 1 : 0);
+type SteppedKnobModelConfig<T> = {
+  dictionary: T[] | readonly T[];
+  initial: NoInfer<T>;
+};
+
+const createSteppedKnobModel = <T>({
+  dictionary,
+  initial,
+}: SteppedKnobModelConfig<T>) => {
+  const $position = createStore(initial as T);
+  const setPosition = createEvent<T>();
+  const setNext = createEvent();
+  const setPrevious = createEvent();
+
+  const resetPosition = createEvent();
+
+  $position
+    .on(setPosition, (_, v) => v)
+    .on(setNext, (curr) => {
+      const newIdx = dictionary.indexOf(curr) + 1;
+      return newIdx in dictionary ? dictionary[newIdx] : dictionary[0];
+    })
+    .on(setPrevious, (curr) => {
+      const newIdx = dictionary.indexOf(curr) - 1;
+      return newIdx in dictionary
+        ? dictionary[newIdx]
+        : dictionary[dictionary.length - 1];
+    })
+    .reset(resetPosition);
+
+  return {
+    position: $position,
+    setPosition,
+    setNext,
+    setPrevious,
+    resetPosition,
+  };
+};
+
+type RangedKnobModelConfig = {
+  range: [number, number];
+  initial: number;
+  defaultStep?: number;
+};
+const createRangedKnobModel = ({
+  range,
+  initial,
+  defaultStep,
+}: RangedKnobModelConfig) => {
+  const step = defaultStep || 1;
+  const $position = createStore(initial);
+  const setPosition = createEvent();
+  const set = createEvent<number>();
+
+  const increase = set.prepend((v: number = step) => v);
+  const decrease = set.prepend((v: number = step) => -v);
+  const resetPosition = createEvent();
+
+  $position
+    .on(setPosition, (_, v) => v)
+    .on(set, (curr, amount) => clamp(curr + amount, range[0], range[1]))
+    .reset(resetPosition);
+
+  return {
+    position: $position,
+    setPosition,
+    increase,
+    decrease,
+    resetPosition,
+  };
+};
+
+const deepClone = <T extends object>(obj: T) =>
+  JSON.parse(JSON.stringify(obj)) as T;
 
 const isOneOf =
   <T>(...args: T[]) =>
@@ -329,25 +477,45 @@ const isNotOneOf =
     return !args.includes(target);
   };
 
-const createInstrumentDataset = () => ({
-  a: Array.from({ length: 16 }).map(() => 0),
-  b: Array.from({ length: 16 }).map(() => 0),
+const createInstrumentDataset = () => {
+  return Object.fromEntries(
+    instrumentsChain.map((instrument) => [
+      instrument,
+      Array.from({ length: 16 }).map(() => 0),
+    ])
+  ) as Record<InstrumentsKeys, number[]>;
+};
+
+const createParts = (): PatternPart => {
+  return {
+    1: createInstrumentDataset(),
+    2: createInstrumentDataset(),
+  };
+};
+
+const createBasicVariation = (): BasicVariation => ({
+  a: createParts(),
+  b: createParts(),
 });
 
-const createDataset = <K extends Record<string, any>>(config: {
+const createComposition = <K extends Record<string, any>>(config: {
   instruments: K;
   initial?: Partial<InstrumentsSetDataset>;
 }) => {
   const keys = Object.keys(config.instruments);
 
   const dataset = Object.fromEntries(
-    keys.map((key) => [key, createInstrumentDataset()])
+    keys.map((key) => [key, createBasicVariation()])
   ) as InstrumentsSetDataset;
 
   if (config.initial) {
     Object.assign(dataset, config.initial);
   }
-  return dataset;
+
+  return {
+    composed: [],
+    patterns: { 1: createBasicVariation() },
+  } as Composition;
 };
 
 const createToneInstance = () => {
@@ -359,42 +527,3 @@ const createToneInstance = () => {
     initialize: fxInitialize,
   };
 };
-
-// console.log(createBassDrumInstrument());
-
-// const noop = ()  => void 0;
-
-// const createKnobsRowModel = <
-//   F extends { handler(node: any, level: number): void; initial?: number },
-//   R extends F[]
-// >(config: {
-//   nodes: R;
-//   instrument: InstrumentsSet[InstrumentsKeys];
-// }) => {
-//   const models = config.instrument.nodes?.map((node, k) =>
-//     createKnobModel({
-//       node,
-//       cb: config.nodes[k]?.handler || noop,
-//       initial: config.nodes[k]?.initial,
-//     })
-//   );
-
-//   return {
-//     ...models,
-//   };
-// };
-
-// const createKnobModel = <T>(config: {
-//   node: T;
-//   cb: (node: T, level: number) => void;
-//   initial?: number;
-// }) => {
-//   const setLevel = createEvent<number>();
-//   const level = restore(setLevel, config.initial || 50);
-//   const fx = createEffect((level: number) => config.cb(config.node, level));
-
-//   forward({ from: level, to: fx });
-//   fx(level.getState());
-
-//   return { level, setLevel, fx };
-// };

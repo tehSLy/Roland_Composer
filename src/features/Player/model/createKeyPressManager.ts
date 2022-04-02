@@ -6,46 +6,15 @@ import {
   guard,
   split,
 } from "effector";
-import { instrumentsChain } from "../shared/constants";
-import { Roland808Model } from "./createPlayerModel";
-
-type KeyAction =
-  | "startStop"
-  | "toggleGui"
-  | "abort"
-  | "modeInstrument"
-  | "modeMute"
-  | "modePlayerMode"
-  | "modeVolume"
-  | "increase"
-  | "decrease"
-  | "clear"
-  | "cycleAb"
-  | "tap"
-  | "pad1"
-  | "pad2"
-  | "pad3"
-  | "pad4"
-  | "pad5"
-  | "pad6"
-  | "pad7"
-  | "pad8"
-  | "pad9"
-  | "pad10"
-  | "pad11"
-  | "pad12"
-  | "pad13"
-  | "pad14"
-  | "pad15"
-  | "pad16";
-
-type KeyMap = Record<string, KeyAction>;
+import { KeyAction, KeyMap } from "../../shared";
+import { instrumentsChain, playerModes } from "../shared/constants";
+import { DeviceModel } from "./createPlayerModel";
 
 type Mode = "mute" | "instrument" | "mode" | "bpm" | "volume" | "togglePad";
 
 type Config = {
   keyMap: KeyMap;
-  player: Roland808Model;
+  player: DeviceModel;
 };
 
 const actionToModeMap: Partial<Record<KeyAction, Mode>> = {
@@ -53,6 +22,7 @@ const actionToModeMap: Partial<Record<KeyAction, Mode>> = {
   modeMute: "mute",
   modePlayerMode: "mode",
   modeVolume: "volume",
+  modeBpm: "bpm",
 };
 
 export const createKeyPressManager = ({ keyMap, player }: Config) => {
@@ -77,10 +47,14 @@ export const createKeyPressManager = ({ keyMap, player }: Config) => {
       padPressed.prepend(() => v),
     ])
   );
+  fxKeyPressed.watch(console.log);
+
+  const increasePressed = createEvent();
+  const decreasePressed = createEvent();
 
   split({
     source: actionTriggered,
-    match: (v) => v,
+    match: (v) => (console.log(v), v),
     cases: {
       startStop: player.togglePlay.prepend(() => null),
       // toggleGui: createEffect(console.log),
@@ -88,6 +62,8 @@ export const createKeyPressManager = ({ keyMap, player }: Config) => {
       ...padHandlers,
       tap: player.tapPressed,
       cycleAb: player.cycleABModes,
+      decrease: decreasePressed,
+      increase: increasePressed,
     },
   });
 
@@ -97,7 +73,34 @@ export const createKeyPressManager = ({ keyMap, player }: Config) => {
     cases: {
       togglePad: player.toggleActiveInstrumentPad,
       mute: player.mute.prepend((k) => instrumentsChain[k]),
-      instrument: player.setInstrument.prepend((k) => instrumentsChain[k]),
+      instrument: player._instrument.setPosition.prepend(
+        (k) => instrumentsChain[k]
+      ),
+      mode: player._mode.setPosition.prepend((k) =>
+        k in playerModes ? playerModes[k] : playerModes[1]
+      ),
+    },
+  });
+
+  split({
+    source: increasePressed,
+    match: $mode,
+    cases: {
+      instrument: player._instrument.setNext,
+      mode: player._mode.setNext,
+      bpm: player._bpm.increase.prepend(() => void 0),
+    },
+  });
+
+  player._bpm.position.watch(console.log);
+
+  split({
+    source: decreasePressed,
+    match: $mode,
+    cases: {
+      instrument: player._instrument.setPrevious,
+      mode: player._mode.setPrevious,
+      bpm: player._bpm.decrease.prepend(() => void 0),
     },
   });
   $mode

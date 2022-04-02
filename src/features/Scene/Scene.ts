@@ -1,14 +1,16 @@
 import { createEffect, createEvent, forward } from "effector";
+import throttle from "lodash.throttle";
 import * as THREE from "three";
-import { createAdjustableTicker, createAnimationFrameTicker } from "../../lib/createTicker/createTicker";
+import { createAnimationFrameTicker } from "../../lib/createTicker/createTicker";
 import { OrbitControls } from "../../lib/OrbitControls/OrbitControls";
+import { clearColor } from "../shared";
 
 export const createScene = () => {
   const renderer = new THREE.WebGLRenderer({
     antialias: true,
   });
 
-  renderer.setClearColor(0xebe6da, 1);
+  renderer.setClearColor(clearColor, 1);
   renderer.setSize(window.innerWidth, window.innerHeight);
   renderer.setPixelRatio(window.devicePixelRatio);
   renderer.toneMapping = THREE.LinearToneMapping;
@@ -39,10 +41,23 @@ export const createScene = () => {
   const setMode = createEvent();
 
   const ticker = createAnimationFrameTicker();
-  // const ticker = createAdjustableTicker({ delay: 1000 / 60, mode: "delay" });
+
+  const fxBindElement = createEffect((el: HTMLElement) =>
+    el.appendChild(renderer.domElement)
+  );
+
+  const fxSceneAdd = createEffect(scene.add.bind(scene));
 
   forward({ from: ticker.tick, to: fxAnimate });
-  document.body.appendChild(renderer.domElement);
+
+  window.addEventListener("resize", throttle(onWindowResize, 100), false);
+
+  function onWindowResize() {
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+
+    renderer.setSize(window.innerWidth, window.innerHeight);
+  }
 
   return {
     renderer,
@@ -51,7 +66,9 @@ export const createScene = () => {
     ticker,
     cameraControls: controls,
     setRenderDelay,
-    setMode
+    setMode,
+    bindElement: fxBindElement,
+    add: fxSceneAdd,
   };
 };
 

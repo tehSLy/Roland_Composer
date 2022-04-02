@@ -4,7 +4,7 @@ import {
   createStore,
   guard,
   sample,
-  Store,
+  Store
 } from "effector";
 import { Material, Mesh } from "three";
 import { DragManager } from "./createDragManager";
@@ -26,7 +26,7 @@ export const createObjectHighlightManager = ({
     intersectionsManager.activeElement,
     overrideElement,
     (active, override) => {
-      return override || active;
+      return (override || active) as Mesh;
     }
   );
 
@@ -42,8 +42,11 @@ export const createObjectHighlightManager = ({
     const sourceMaterial = obj.material as Material;
     const resultMaterial = sourceMaterial.clone();
 
+    //@ts-ignore
     resultMaterial.color.r = multiplier;
+    //@ts-ignore
     resultMaterial.color.g = multiplier;
+    //@ts-ignore
     resultMaterial.color.b = multiplier / 2;
 
     sourceMaterialCache.set(obj, obj.material as Material);
@@ -91,5 +94,5 @@ export const createObjectHighlightManager = ({
   return {
     highlightElement: fxHighlightElement,
     resetHighlight: fxResetObjectMaterial,
-  }
+  };
 };

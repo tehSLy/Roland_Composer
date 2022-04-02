@@ -16,18 +16,15 @@ type Config = {
   alterPrefix?: string;
 };
 
-export const createInstrument = ({
-  additionalKnobsCount: knobsCount = 0,
-  prefix: prefixInitial,
-  alterPrefix,
-  urlMap,
+const createInstrumentBaseModel = ({
+  prefixInitial,
+  knobsCount,
   knobsInitial,
-}: Config) => {
-  const { noteToUrl, sampleToNote } = createNotesMap(urlMap);
-  const sampler = new Sampler({
-    urls: noteToUrl,
-  }).toDestination();
-
+}: {
+  prefixInitial: string;
+  knobsInitial?: number[];
+  knobsCount: number;
+}) => {
   const $prefix = createStore(prefixInitial);
   const $isMainInstrumentToggled = $prefix.map(
     (prefix) => prefix === prefixInitial
@@ -45,6 +42,48 @@ export const createInstrument = ({
   const setKnob = createEvent<{ id: number; level: number }>();
   const setKnobs = createEvent<number[]>();
   const setVolume = createEvent<number>();
+  return {
+    $prefix,
+    $isMainInstrumentToggled,
+    $volume,
+    $knobs,
+    $currentNote,
+    togglePrefix,
+    setPrefix,
+    setKnob,
+    setKnobs,
+    setVolume,
+  };
+};
+
+export const createInstrument = ({
+  additionalKnobsCount: knobsCount = 0,
+  prefix: prefixInitial,
+  alterPrefix,
+  urlMap,
+  knobsInitial,
+}: Config) => {
+  const { noteToUrl, sampleToNote } = createNotesMap(urlMap);
+  const sampler = new Sampler({
+    urls: noteToUrl,
+  }).toDestination();
+
+  const {
+    $currentNote,
+    $isMainInstrumentToggled,
+    $knobs,
+    $prefix,
+    $volume,
+    setKnob,
+    setKnobs,
+    setPrefix,
+    setVolume,
+    togglePrefix,
+  } = createInstrumentBaseModel({
+    knobsCount,
+    knobsInitial,
+    prefixInitial,
+  });
   const play = attach({
     source: $currentNote,
     effect: (note: string) => {
@@ -89,6 +128,10 @@ export const createInstrument = ({
       prefix: prefixInitial,
     },
   };
+};
+
+export const createAccent = () => {
+  return {} as ReturnType<typeof createInstrument>;
 };
 
 export const createNotesMap = (urlMap: Record<string, string>) => {

@@ -1,10 +1,13 @@
-import { attach, createEffect, createEvent, guard, restore } from "effector";
+import { attach, createEffect, createEvent, createStore, guard, restore } from "effector";
 import * as THREE from "three";
 import { Material, Mesh } from "three";
 
 export const createIntersectionsManager = (config: {
   camera: THREE.Camera;
 }) => {
+  const start = createEvent();
+  const stop = createEvent();
+  const $isRunning = createStore(true);
   const mouseProjection = projectMouse(config.camera);
 
   const setIntersectable = createEvent<THREE.Object3D<THREE.Event>[]>();
@@ -28,8 +31,11 @@ export const createIntersectionsManager = (config: {
   };
 
   const render = attach({
-    source: $intersectable,
-    effect: createEffect((objects: THREE.Object3D<THREE.Event>[]) => {
+    source: {objects: $intersectable,isRunning: $isRunning},
+    effect: ({objects, isRunning}) => {
+      if(!isRunning){
+        return;
+      }
       if (!objects.length) {
         return;
       }
@@ -39,13 +45,14 @@ export const createIntersectionsManager = (config: {
         mouseProjection.getIntersectionPointWith(objects);
 
       if (intersectionPoint) {
-        const obj = intersectionPoint.object as Mesh;
         intersected(intersectionPoint);
       } else {
         resetIntersected();
       }
-    }),
+    },
   });
+
+  $isRunning.on(start, () => true).on(stop, () => false);
 
   return {
     render,
@@ -53,6 +60,7 @@ export const createIntersectionsManager = (config: {
     mouseProjection,
     setIntersectable,
     createMutation,
+    isRunning: $isRunning
   };
 };
 

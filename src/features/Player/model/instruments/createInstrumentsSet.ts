@@ -1,3 +1,5 @@
+import { createEffect, forward, guard } from "effector";
+import { createTicker } from "../../../../lib/createTicker";
 import { createInstrument } from "./createInstrument";
 import {
   bassDrumUrlMap,
@@ -10,11 +12,13 @@ import {
   lowTomMap,
   midTomMap,
   rimshotMap,
-  snareDrumUrlMap,
+  snareDrumUrlMap
 } from "./urlMaps";
 
-
 export const createInstrumentsSet = () => {
+  const ticker = createTicker({ delay: 1000 });
+  const loaded: Record<string, boolean> = {};
+
   const instruments = {
     bassDrum: createInstrument({
       additionalKnobsCount: 2,
@@ -72,9 +76,33 @@ export const createInstrumentsSet = () => {
       urlMap: snareDrumUrlMap,
       additionalKnobsCount: 2,
     }),
+    accent: {
+      
+    },
   };
 
-  return instruments;
+  const fxPollLoading = createEffect(() => {
+    const { accent, ...instrumentsMap } = instruments;
+    for (const key in instrumentsMap) {
+      if (loaded[key]) {
+        continue;
+      }
+      const instrument = instrumentsMap[key as keyof typeof instrumentsMap];
+      loaded[key] = instrument.sampler.loaded;
+    }
+    return Object.values(loaded).every(Boolean);
+  });
+
+  const instrumentsLoaded = guard(fxPollLoading.doneData, {
+    filter: Boolean,
+  });
+
+  forward({ from: ticker.tick, to: fxPollLoading });
+  forward({ from: instrumentsLoaded, to: ticker.stop });
+
+  ticker.start();
+
+  return { instruments, instrumentsLoaded };
 };
 
 export type InstrumentsSet = ReturnType<typeof createInstrumentsSet>;

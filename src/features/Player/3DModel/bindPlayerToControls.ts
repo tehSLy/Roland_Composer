@@ -4,7 +4,7 @@ import { ControlsObjects } from ".";
 import { DeviceModel } from "../model/createPlayerModel";
 import { InstrumentsSet } from "../model/instruments";
 import { activeLightMaterial } from "../shared/ActiveLightMaterial";
-import { BPM, instrumentsChain, playerModes } from "../shared/constants";
+import { instrumentsChain, playerModes } from "../shared/constants";
 import { ClickManager } from "./createClickManager";
 import {
   ControlsModel,
@@ -39,11 +39,9 @@ export const bindPlayerToControls = ({
   dragManager.registerRangeDragControl({
     range: [65, 215],
     object: controls.bpmSelector,
-    handler: player.setBPM,
+    handler: player.setBPM.prepend((bpm) => bpm),
     resolveCache: () => player._meta.$bpm.getState(),
   });
-
-  player.setBPM.watch(console.log)
 
   dragManager.registerSteppedDragControl({
     object: controls.modeSelector,

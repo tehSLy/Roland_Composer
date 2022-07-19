@@ -29,9 +29,12 @@ export const createKeyPressManager = ({ keyMap, player }: Config) => {
   const $mode = createStore<Mode>("togglePad");
   const padPressed = createEvent<number>();
 
-  const fxResolveAction = createEffect(
-    (event: KeyboardEvent) => keyMap[eventToString(event)]
-  );
+  const fxResolveAction = createEffect((event: KeyboardEvent) => {
+    if (event.uiEvent) {
+      return;
+    }
+    return keyMap[eventToString(event)];
+  });
   const fxKeyPressed = attach({ effect: fxResolveAction });
   const fxModeSet = attach({ effect: fxResolveAction });
   const fxModeRelease = attach({ effect: fxResolveAction });
@@ -47,17 +50,15 @@ export const createKeyPressManager = ({ keyMap, player }: Config) => {
       padPressed.prepend(() => v),
     ])
   );
-  fxKeyPressed.watch(console.log);
 
   const increasePressed = createEvent();
   const decreasePressed = createEvent();
 
   split({
     source: actionTriggered,
-    match: (v) => (console.log(v), v),
+    match: (v) => v,
     cases: {
       startStop: player.togglePlay.prepend(() => null),
-      // toggleGui: createEffect(console.log),
       abort: abortCurrentMode,
       ...padHandlers,
       tap: player.tapPressed,
@@ -92,8 +93,6 @@ export const createKeyPressManager = ({ keyMap, player }: Config) => {
     },
   });
 
-  player._bpm.position.watch(console.log);
-
   split({
     source: decreasePressed,
     match: $mode,
@@ -114,8 +113,6 @@ export const createKeyPressManager = ({ keyMap, player }: Config) => {
   document.addEventListener("keypress", fxKeyPressed);
   document.addEventListener("keydown", fxModeSet);
   document.addEventListener("keyup", fxModeRelease);
-
-  fxKeyPressed.watch(console.log);
 };
 
 const eventToString = ({ code, ctrlKey, shiftKey }: KeyboardEvent) =>

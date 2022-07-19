@@ -7,6 +7,7 @@ import {
   Store,
 } from "effector";
 import throttle from "lodash.throttle";
+import { clamp } from "ramda";
 import * as THREE from "three";
 import { Vector2 } from "three";
 import { IntersectionsManager } from "./createIntersectionManager";
@@ -180,16 +181,12 @@ export const createDragManager = ({
           const threshold = config.threshold || 35;
           const newValue = Math.round(base - cache - distance / threshold);
 
-          const maxValue = base;
-          const resultValue =
-            base -
-            (newValue > maxValue
-              ? maxValue
-              : newValue <= config.range[0]
-              ? config.range[0]
-              : newValue);
-
-          config.handler(resultValue as C);
+          const clamped = clamp(
+            config.range[0],
+            config.range[1],
+            base - newValue
+          );
+          config.handler(clamped as C);
         },
         onEnd() {},
       },

@@ -130,6 +130,8 @@ export const createRoland808Model = (config?: {
   const $composition = createStore(dataset);
   const $note = createStore(0);
 
+  const fillInEvery = createEvent<2 | 4 | 8>();
+
   const lowTumbler = createToggle({ initial: false });
   const midTumbler = createToggle({ initial: false });
   const hiTumbler = createToggle({ initial: false });
@@ -163,10 +165,8 @@ export const createRoland808Model = (config?: {
     $currentPart,
     $currentPattern,
     (composition, instrument, ab, part, pattern) => {
-      console.log(composition);
       const seq = composition.patterns[pattern][ab]?.[part]?.[instrument];
       return seq || Array.from({ length: 16 }).map((_, k) => 0);
-      // composition[instrument]?.[ab] || Array.from({ length: 16 }).map((_, k) => k)
     }
   );
 
@@ -301,28 +301,50 @@ export const createRoland808Model = (config?: {
     pattern: $currentPattern,
   });
 
+  const padToggled = sample({
+    source: $scope,
+    clock: toggleActiveInstrumentPad,
+    fn: (source, pad) => ({
+      ...source,
+      pad,
+    }),
+  });
+
+  const filledIn = sample({
+    source: $scope,
+    clock: fillInEvery,
+    fn: (source, every) => ({
+      ...source,
+      every,
+    }),
+  });
+
+  const tappepPressedWithScope = sample({
+    source: { scope: $scope, note: $note },
+    clock: tapPressed,
+  });
+
+  const patternCleared = sample({ source: $scope, clock: clearPattern });
+
   $audioLoaded.on(instrumentsLoaded, () => true);
 
   $composition
-    .on(
-      sample($scope, toggleActiveInstrumentPad, (source, pad) => ({
-        ...source,
-        pad,
-      })),
-      (composition, { ab, instrument, pad, part, pattern }) => {
-        const clone = deepClone(composition);
-        //fast inverse
-        clone.patterns[pattern][ab]![part]![instrument][pad] ^= 1;
-        return clone;
-      }
-    )
-    .on(sample($instrument, clearPattern), (dataset, instrument) => ({
-      ...dataset,
-      [instrument]: createBasicVariation(),
-    }))
+    .on(padToggled, (composition, { ab, instrument, pad, part, pattern }) => {
+      const clone = deepClone(composition);
+      //fast inverse
+      clone.patterns[pattern][ab]![part]![instrument][pad] ^= 1;
+      return clone;
+    })
+    .on(patternCleared, (composition, { ab, instrument, part, pattern }) => {
+      const clone = deepClone(composition);
+      clone.patterns[pattern][ab]![part]![instrument] = Array.from({
+        length: 16,
+      }).map(() => 0);
+      return clone;
+    })
     .on(clearTrack, () => createComposition({ instruments }))
     .on(
-      sample({ scope: $scope, note: $note }, tapPressed),
+      tappepPressedWithScope,
       (composition, { scope: { ab, instrument, part, pattern }, note }) => {
         const noteAdjusted = note - 1 < 0 ? 0 : note - 1;
         const clone = deepClone(composition);
@@ -331,7 +353,16 @@ export const createRoland808Model = (config?: {
 
         return clone;
       }
-    );
+    )
+    .on(filledIn, (composition, { ab, every, instrument, part, pattern }) => {
+      const clone = deepClone(composition);
+      clone.patterns[pattern][ab]![part]![instrument].forEach(
+        (_, idx) =>
+          (clone.patterns[pattern][ab]![part]![instrument][idx] =
+            idx === 0 || idx % every === 0 ? 1 : 0)
+      );
+      return clone;
+    });
 
   guard(clearButtonPressed, {
     filter: $currentMode.map(isOneOf<PlayerMode>("compose", "play")),
@@ -354,6 +385,7 @@ export const createRoland808Model = (config?: {
     activeInstrument: $instrument,
     activePadLights: $activePadLights,
     cycleABModes,
+    clearPattern,
     cycleBPM,
     cycleInstrument,
     clearButtonPressed,
@@ -361,6 +393,7 @@ export const createRoland808Model = (config?: {
     instruments,
     setInstrument,
     setBPM,
+    fillInEvery,
     start,
     stop,
     togglePlay,
@@ -441,7 +474,7 @@ const createRangedKnobModel = ({
 }: RangedKnobModelConfig) => {
   const step = defaultStep || 1;
   const $position = createStore(initial);
-  const setPosition = createEvent();
+  const setPosition = createEvent<number>();
   const set = createEvent<number>();
 
   const increase = set.prepend((v: number = step) => v);

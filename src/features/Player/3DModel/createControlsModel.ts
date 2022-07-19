@@ -2,8 +2,6 @@ import { attach, createEffect, createEvent, Effect } from "effector";
 import { ControlsObjects } from ".";
 import {
   ABMode,
-  BPM,
-  BPMStep,
   instrumentsChain,
   InstrumentsKeys,
   PlayerMode,
@@ -49,17 +47,14 @@ export const createControlsModel = () => {
   });
 
   const bpmSelectorModel = createBindableModelFactory({
-    handler: (object, bpm: BPMStep) => {
+    handler: (object, bpm: number) => {
       const angle = bpmMap[bpm];
       const rotation = object.rotation;
-
-      return object.rotation.set(
-        rotation.x,
-        rotation.y,
-        angle === undefined ? bpmMap[BPM[4]] : angle
-      );
+      return object.rotation.set(rotation.x, rotation.y, angle || 0);
     },
-    model: (fx) => ({ setBPM: fx }),
+    model: (fx) => ({
+      setBPM: fx,
+    }),
   });
 
   const modeSelectorModel = createBindableModelFactory({
@@ -255,7 +250,7 @@ const abMap = {
 const bpmMap = createMap({
   from: -3.05,
   to: 2.2,
-  dictionary: BPM,
+  dictionary: Array.from({ length: 215 - 65 + 1 }).map((_, k) => k + 65),
 });
 
 const playerModesMap = createMap({

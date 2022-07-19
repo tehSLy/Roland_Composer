@@ -1,7 +1,6 @@
 import { Store } from "effector";
 import { styled } from "foliage";
-import { clearColor } from "../shared";
-import { clearColorString } from "../shared/palette";
+import { h } from "forest";
 
 type Config = {
   isVisible: Store<boolean>;
@@ -10,10 +9,38 @@ type Config = {
 export const LoadingIndicator = ({ isVisible }: Config) => {
   Element({
     visible: isVisible,
-    style: {
-      backgroundColor: clearColorString,
+    // style: {
+    //   backgroundColor: clearColorString,
+    // },
+    // text: "Loading...",
+    fn() {
+      h("div", {
+        attr: {
+          class: "flex justify-center items-center",
+        },
+        fn() {
+          h("div", {
+            attr: {
+              class:
+                "spinner-border animate-spin inline-block w-8 h-8 border-4 rounded-full border-amber-700",
+              role: "status",
+            },
+            style: {
+              borderStyle: "solid",
+              borderBottomColor: "transparent"
+            },
+            fn() {
+              h("span", {
+                text: "Loading...",
+                attr: {
+                  class: "hidden",
+                },
+              });
+            },
+          });
+        },
+      });
     },
-    text: "Loading..."
   });
 };
 
@@ -25,5 +52,3 @@ const Element = styled.div`
   align-items: center;
   justify-content: center;
 `;
-
-console.log(clearColor);

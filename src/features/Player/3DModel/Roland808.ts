@@ -1,6 +1,6 @@
 import { createEffect, createStore, restore } from "effector";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
-import model from "../../../../assets/models/Roland/808_hires4real.glb";
+import model from "url:../../../../assets/models/Roland/808_hires4real.glb";
 import { degreesToRadians } from "../../../lib/radiansToDegrees/radiansToDegrees";
 
 export const createRoland3DModel = () => {

@@ -10,10 +10,11 @@ import {
   createRoland3DModel,
   createRoland808Model,
   disableCameraControlsUponDrag,
-  resolveControls,
+  resolveControls
 } from "../Player";
 import { createScene } from "../Scene";
 import { keymapping } from "../shared";
+import { createUIModel } from "./createUIModel";
 
 export const createAppModel = () => {
   const init = createEvent();
@@ -36,6 +37,8 @@ export const createAppModel = () => {
     player.isLoaded,
     (...assets) => assets.some((v) => !v)
   );
+
+  const uiModel = createUIModel();
 
   createKeyPressManager({
     keyMap: keymapping,
@@ -91,6 +94,7 @@ export const createAppModel = () => {
     init,
     isLoading: $isLoadingAssets,
     sceneModel,
+    uiModel,
   };
 };
 

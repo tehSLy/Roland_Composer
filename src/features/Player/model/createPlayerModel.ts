@@ -7,9 +7,11 @@ import {
   forward,
   guard,
   sample,
+  split,
   Store,
 } from "effector";
 import { clamp } from "lodash";
+import { spread } from "patronum";
 import * as Tone from "tone";
 import { NoInfer } from "../../../../types/utils";
 import { createTicker } from "../../../lib/createTicker";
@@ -58,6 +60,7 @@ export const createRoland808Model = (config?: {
   dataset?: Partial<InstrumentsSetDataset>;
   bpm?: BPMStep;
 }) => {
+  const setComposition = createEvent<Composition>();
   const $currentPattern = createStore(1);
   const $currentPart = createStore<1 | 2>(1);
 
@@ -184,17 +187,16 @@ export const createRoland808Model = (config?: {
   );
 
   const cycleABModes = createEvent();
-
   const togglePlay = createEvent();
 
-  guard(sample($isRunning, togglePlay), {
-    filter: Boolean,
-    target: stop,
-  });
-
-  guard(sample($isRunning, togglePlay), {
-    filter: (v) => !v,
-    target: start,
+  split({
+    source: $isRunning.map(String),
+    clock: togglePlay,
+    match: (v: string) => v,
+    cases: {
+      ["true"]: stop,
+      ["false"]: start,
+    },
   });
 
   const setABMode = createEvent<ABMode>();
@@ -319,12 +321,32 @@ export const createRoland808Model = (config?: {
     }),
   });
 
-  const tappepPressedWithScope = sample({
+  const tapPressedWithScope = sample({
     source: { scope: $scope, note: $note },
     clock: tapPressed,
   });
 
   const patternCleared = sample({ source: $scope, clock: clearPattern });
+
+  const snapShotMap = {
+    composition: $composition,
+    ab: $ab,
+    abMode: $abMode,
+    bpm: bpmKnob.position,
+    knobs: createStore({}),
+  };
+
+  const fxMakeSnapshot = attach({
+    effect: (params: ComposerSnapshot, _: void) => params,
+    source: snapShotMap,
+  });
+
+  const loadSnapshot = createEffect((v: ComposerSnapshot) => v);
+
+  spread({
+    source: loadSnapshot.doneData,
+    targets: snapShotMap,
+  });
 
   $audioLoaded.on(instrumentsLoaded, () => true);
 
@@ -344,7 +366,7 @@ export const createRoland808Model = (config?: {
     })
     .on(clearTrack, () => createComposition({ instruments }))
     .on(
-      tappepPressedWithScope,
+      tapPressedWithScope,
       (composition, { scope: { ab, instrument, part, pattern }, note }) => {
         const noteAdjusted = note - 1 < 0 ? 0 : note - 1;
         const clone = deepClone(composition);
@@ -379,6 +401,7 @@ export const createRoland808Model = (config?: {
   forward({ from: generator.tick, to: fxPlay });
   forward({ from: start, to: generator.start });
   forward({ from: stop, to: generator.stop });
+  forward({ from: setComposition, to: [$composition] });
 
   return {
     isLoaded: $audioLoaded,
@@ -386,6 +409,7 @@ export const createRoland808Model = (config?: {
     activePadLights: $activePadLights,
     cycleABModes,
     clearPattern,
+    setComposition,
     cycleBPM,
     cycleInstrument,
     clearButtonPressed,
@@ -396,6 +420,7 @@ export const createRoland808Model = (config?: {
     fillInEvery,
     start,
     stop,
+    composition: $composition,
     togglePlay,
     toggleActiveInstrumentPad,
     tone,
@@ -419,6 +444,10 @@ export const createRoland808Model = (config?: {
       $bpm,
       toggleAB,
       setABMode,
+    },
+    snapshot: {
+      make: fxMakeSnapshot,
+      load: loadSnapshot,
     },
   };
 };
@@ -460,6 +489,14 @@ const createSteppedKnobModel = <T>({
     setPrevious,
     resetPosition,
   };
+};
+
+export type ComposerSnapshot = {
+  composition: Composition;
+  bpm: number;
+  knobs: any;
+  ab: string;
+  abMode: string;
 };
 
 type RangedKnobModelConfig = {

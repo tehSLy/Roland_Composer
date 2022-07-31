@@ -1,27 +1,34 @@
-import { createEvent } from "effector";
 import { MenuBar } from "../../ui/Menu/MenuBar";
 import { AppModel } from "../AppModel";
 import { resolveKeyLabel, resolveShortcut } from "../shared";
+
+const filePickerApiAvailable =
+  "showSaveFilePicker" in window && "showOpenFilePicker" in window;
 
 export const Menu = ({ appModel }: { appModel: AppModel }) => {
   MenuBar({
     schema: [
       {
         label: "Menu",
-        visible: false,
         children: [
           {
             label: "Save...",
             shortcut: "Ctrl + S",
+            disabled: true,
           },
           {
             label: "Import...",
+            handler: appModel.import,
+            disabled: !filePickerApiAvailable,
           },
           {
             label: "Export...",
+            handler: appModel.export,
+            disabled: !filePickerApiAvailable,
           },
           {
             label: "Render...",
+            disabled: true,
           },
         ],
       },
@@ -95,13 +102,18 @@ export const Menu = ({ appModel }: { appModel: AppModel }) => {
       },
       {
         label: "Help",
-        visible: false,
         children: [
           {
             label: "Open manual...",
+            meta: {
+              type: "link",
+              url: "http://cdn.roland.com/assets/media/pdf/TR-808_OM.pdf",
+              openIn: "newTab",
+            },
           },
           {
             label: "About...",
+            disabled: true,
           },
         ],
       },

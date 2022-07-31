@@ -49,4 +49,6 @@ export const App = ({ appModel }: Config) => {
     });
   });
   Menu({ appModel });
+
+  // Modal();
 };

@@ -1,6 +1,16 @@
-import { createEvent, createStore, Effect, Event, guard, Unit } from "effector";
+import classNames from "classnames";
+import {
+  createEvent,
+  createStore,
+  Effect,
+  Event,
+  guard,
+  sample,
+  Unit,
+} from "effector";
 import { h, spec, StoreOrData } from "forest";
 import { hover } from "../../lib/forest-html";
+import { storeOrDataToStore } from "../../lib/storeOrDataToStore";
 import { StaticDropdownList } from "./DropdownList";
 import { menuLabelStyle } from "./menuLabelStyle";
 
@@ -10,19 +20,50 @@ export const MenuCommand = ({
   meta,
   shortcut,
   disabled,
+  visible,
 }: MenuCommandSchema) => {
+  const clicked = createEvent<globalThis.MouseEvent>();
+  const $isDisabled = storeOrDataToStore(disabled, false);
+
+  if (handler) {
+    sample({
+      clock: clicked,
+      filter: $isDisabled.map((v) => !v),
+      target: handler.prepend((v: MouseEvent) => v),
+    });
+  }
+
   h("div", () => {
     menuLabelStyle(
-      "hover:bg-slate-500 hover:text-gray-100 px-5 py-1 flex justify-between gap-x-4 relative"
+      $isDisabled.map((disabled) =>
+        classNames("px-5 py-1 flex justify-between gap-x-4 relative text-gray-400", {
+          "hover:text-gray-100 hover:bg-slate-500": !disabled,
+          "text-neutral-400": disabled,
+        })
+      )
     );
+
+    if (meta?.type === "link") {
+      h("a", {
+        text: label,
+        attr: {
+          href: meta.url,
+          target: meta.openIn === "newTab" ? "_blank" : "",
+        },
+      });
+
+      return;
+    }
+
     spec({
       style: {
         cursor: "pointer",
         userSelect: "none",
       },
       attr: {
-        disabled: disabled || createStore(false),
+        disabled: $isDisabled,
       },
+      visible: storeOrDataToStore(visible, true),
     });
 
     h("span", {
@@ -32,7 +73,7 @@ export const MenuCommand = ({
     if (handler) {
       spec({
         handler: {
-          click: handler.prepend((v) => v),
+          click: clicked,
         },
       });
     }
@@ -126,10 +167,11 @@ export type MenuCommandSchema = {
     | Effect<MouseEvent, any, any>
     | Event<void>
     | Effect<void, any, any>;
-  meta?: MenuCommandListType | MenuCommandNumberType;
-  disabled?: StoreOrData<string>;
+  meta?: MenuCommandListType | MenuCommandNumberType | MenuCommandLinkType;
+  disabled?: StoreOrData<boolean>;
   shortcut?: StoreOrData<string>;
   key?: string;
+  visible?: StoreOrData<boolean>;
 };
 
 export type MenuCommandListType = {
@@ -144,4 +186,10 @@ export type MenuCommandNumberType = {
   from?: number;
   to?: number;
   handler?: Event<number>;
+};
+
+export type MenuCommandLinkType = {
+  type: "link";
+  url: string;
+  openIn?: "newTab" | "sameTab";
 };

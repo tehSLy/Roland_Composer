@@ -1,4 +1,4 @@
-import { combine, createEffect, createEvent, forward } from "effector";
+import { combine, createEffect, createEvent, forward, sample } from "effector";
 import {
   bindPlayerToControls,
   createClickManager,
@@ -10,8 +10,9 @@ import {
   createRoland3DModel,
   createRoland808Model,
   disableCameraControlsUponDrag,
-  resolveControls
+  resolveControls,
 } from "../Player";
+import { ComposerSnapshot } from "../Player/model/createPlayerModel";
 import { createScene } from "../Scene";
 import { keymapping } from "../shared";
 import { createUIModel } from "./createUIModel";
@@ -39,6 +40,52 @@ export const createAppModel = () => {
   );
 
   const uiModel = createUIModel();
+
+  const fxExport = createEffect(async (_: void) => {
+    const snapshot = await player.snapshot.make();
+    const blob = new Blob([JSON.stringify(snapshot)], {
+      type: "application/json",
+    });
+    const pickerOptions = {
+      suggestedName: `Untitled.json`,
+      types: [
+        {
+          description: "JSON File",
+          accept: {
+            "application/json": [".json", ".txt"],
+          },
+        },
+      ],
+    };
+
+    // @ts-ignore
+    const fileHandle = await window.showSaveFilePicker(pickerOptions);
+    const writableFileStream = await fileHandle.createWritable();
+    await writableFileStream.write(blob);
+    await writableFileStream.close();
+  });
+
+  const fxImport = createEffect(async () => {
+    const pickerOptions = {
+      types: [
+        {
+          description: "JSON File",
+          accept: {
+            "application/json": [".json", ".txt"],
+          },
+        },
+      ],
+    };
+    // @ts-ignore
+    const [fileHandle] = await window.showOpenFilePicker(pickerOptions);
+    const file = await fileHandle.getFile();
+    return file.text().then(JSON.parse) as Promise<ComposerSnapshot>;
+  });
+
+  sample({
+    clock: fxImport.doneData,
+    target: player.snapshot.load,
+  });
 
   createKeyPressManager({
     keyMap: keymapping,
@@ -95,6 +142,8 @@ export const createAppModel = () => {
     isLoading: $isLoadingAssets,
     sceneModel,
     uiModel,
+    export: fxExport,
+    import: fxImport,
   };
 };
 

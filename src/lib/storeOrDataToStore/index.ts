@@ -1,0 +1,2 @@
+export { storeOrDataToStore } from './storeOrDataToStore';
+

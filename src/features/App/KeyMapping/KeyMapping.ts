@@ -50,9 +50,9 @@ const Keybind = ({
 }) => {
   h("div", {
     fn() {
-      menuLabelStyle(
-        classNames(bg, "w-full px-4 py-1 flex flex-row space-between")
-      );
+      menuLabelStyle({
+        class: classNames(bg, "w-full px-4 py-1 flex flex-row space-between"),
+      });
       h("span", {
         text: action,
         attr: {

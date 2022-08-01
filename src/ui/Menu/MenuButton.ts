@@ -22,9 +22,10 @@ export const MenuButton = ({
       text,
     });
 
-    menuLabelStyle(
-      "rounded-md px-2 py-1 hover:bg-gray-500 disabled:text-gray-800 disabled:hover:bg-inherit"
-    );
+    menuLabelStyle({
+      class:
+        "rounded-md px-2 py-1 hover:bg-gray-500 disabled:text-gray-800 disabled:hover:bg-inherit",
+    });
   });
 };
 

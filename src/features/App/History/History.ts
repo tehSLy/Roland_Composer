@@ -32,9 +32,9 @@ export const History = <A extends Event<HistoryAction>[]>({
       height: "calc(100vh - 2.25rem)",
     },
     fn: () => {
-      menuLabelStyle(
-        "absolute bg-neutral-600 w-48 no-scrollbar overflow-y-auto"
-      );
+      menuLabelStyle({
+        class: "absolute bg-neutral-600 w-48 no-scrollbar overflow-y-auto",
+      });
       h("div", {
         text: "History",
         attr: {

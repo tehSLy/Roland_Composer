@@ -1,15 +1,27 @@
-import { createStore, is, Store } from "effector";
+import { combine } from "effector";
 import { spec, StoreOrData } from "forest";
+import { storeOrDataToStore } from "../../lib/storeOrDataToStore";
 
-export const menuLabelStyle = (elementClass?: StoreOrData<string>) => {
-  const $class: Store<string> = is.store(elementClass)
-    ? elementClass
-    : (createStore(elementClass || "") as Store<string>);
+const defaultTextColor = "text-gray-300";
+
+export const menuLabelStyle = (config: {
+  class?: StoreOrData<string>;
+  textColor?: StoreOrData<string | null>;
+}) => {
+  const $class = storeOrDataToStore(config.class, "");
+  const $color = storeOrDataToStore(config.textColor, defaultTextColor);
   spec({
     attr: {
-      class: $class.map(
-        (v) => `font-sans tracking-tight text-gray-300 text-sm ${v}`
+      class: combine(
+        $class,
+        $color,
+        (additionalClass, textColor) =>
+          `font-sans tracking-tight text-sm ${additionalClass} ${
+            textColor ?? defaultTextColor
+          }`
       ),
     },
   });
 };
+
+function foo() {}

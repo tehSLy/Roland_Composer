@@ -36,8 +36,8 @@ export const MenuCommand = ({
   h("div", () => {
     menuLabelStyle(
       $isDisabled.map((disabled) =>
-        classNames("px-5 py-1 flex justify-between gap-x-4 relative text-gray-400", {
-          "hover:text-gray-100 hover:bg-slate-500": !disabled,
+        classNames("px-5 py-1 flex justify-between gap-x-4 relative", {
+          "text-gray-400 hover:text-gray-100 hover:bg-slate-500": !disabled,
           "text-neutral-400": disabled,
         })
       )

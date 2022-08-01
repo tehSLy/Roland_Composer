@@ -8,7 +8,7 @@ export const menuLabelStyle = (elementClass?: StoreOrData<string>) => {
   spec({
     attr: {
       class: $class.map(
-        (v) => `${v} font-sans tracking-tight text-gray-300 text-sm`
+        (v) => `font-sans tracking-tight text-gray-300 text-sm ${v}`
       ),
     },
   });

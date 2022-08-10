@@ -1,7 +1,7 @@
 import classNames from "classnames";
 import { Store } from "effector";
 import { h, StoreOrData } from "forest";
-import { menuLabelStyle } from "../../../ui/Menu/menuLabelStyle";
+import { basicTextStyle } from "../../../ui/shared/styles/basicTextStyle";
 import { keymapping, resolveActionLabel, resolveKeyLabel } from "../../shared";
 
 const SpecialChars = ["PLUS_SIGN"] as const;
@@ -50,7 +50,7 @@ const Keybind = ({
 }) => {
   h("div", {
     fn() {
-      menuLabelStyle({
+      basicTextStyle({
         class: classNames(bg, "w-full px-4 py-1 flex flex-row space-between"),
       });
       h("span", {

@@ -1,4 +1,5 @@
 import { createEvent, createStore } from "effector";
+import { createModalModel } from "../../ui/Modal";
 
 export const createUIModel = () => {
   const toggleKeybindingsVisible = createEvent();
@@ -13,11 +14,16 @@ export const createUIModel = () => {
     (is) => !is
   );
 
+  const aboutModal = createModalModel({
+    isOpen: false,
+  });
+
   return {
     toggleKeybindingsVisible,
     keybindingsVisible: $keybindingsVisible,
     toggleHistoryVisible,
     historyVisible: $historyVisible,
+    aboutModal,
   };
 };
 

@@ -1,13 +1,18 @@
-import { attach, createEffect, createEvent, createStore, guard, restore } from "effector";
+import { attach, createApi, createEvent, createStore, restore } from "effector";
 import * as THREE from "three";
-import { Material, Mesh } from "three";
 
 export const createIntersectionsManager = (config: {
   camera: THREE.Camera;
+  canvasElement?: HTMLCanvasElement;
 }) => {
   const start = createEvent();
   const stop = createEvent();
   const $isRunning = createStore(true);
+  const $isHovered = createStore(false);
+  const { hovered, notHovered } = createApi($isHovered, {
+    hovered: () => true,
+    notHovered: () => false,
+  });
   const mouseProjection = projectMouse(config.camera);
 
   const setIntersectable = createEvent<THREE.Object3D<THREE.Event>[]>();
@@ -30,10 +35,19 @@ export const createIntersectionsManager = (config: {
     return event;
   };
 
+  if (config.canvasElement) {
+    config.canvasElement.onmouseover = hovered.prepend(() => null);
+    config.canvasElement.onmouseout = notHovered.prepend(() => null);
+  }
+
   const render = attach({
-    source: {objects: $intersectable,isRunning: $isRunning},
-    effect: ({objects, isRunning}) => {
-      if(!isRunning){
+    source: {
+      objects: $intersectable,
+      isRunning: $isRunning,
+      isHovered: $isHovered,
+    },
+    effect: ({ objects, isRunning, isHovered }) => {
+      if (!isRunning || !isHovered) {
         return;
       }
       if (!objects.length) {
@@ -60,7 +74,7 @@ export const createIntersectionsManager = (config: {
     mouseProjection,
     setIntersectable,
     createMutation,
-    isRunning: $isRunning
+    isRunning: $isRunning,
   };
 };
 

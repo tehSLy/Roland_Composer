@@ -1,16 +1,41 @@
-import { h } from "forest";
+import { h, StoreOrData } from "forest";
+import { basicTextStyle } from "../shared/styles/basicTextStyle";
 import { MenuDropdown, MenuDropdownSchema } from "./MenuDropdown";
 
-export const MenuBar = ({ schema }: { schema: MenuDropdownSchema[] }) => {
+export const MenuBar = ({
+  schema,
+  title,
+}: {
+  schema: MenuDropdownSchema[];
+  title: StoreOrData<string>;
+}) => {
   h("div", {
     attr: {
       class:
-        "w-screen absolute right-0 top-0 bg-neutral-600 p-1 flex flex-row h-9",
+        "w-screen absolute right-0 top-0 bg-neutral-600 p-1 flex flex-row h-9 justify-center",
     },
     fn: () => {
-      for (const entry of schema) {
-        MenuDropdown(entry);
-      }
+      h("div", {
+        attr: {
+          class: "flex flex-row h-9 absolute left-0",
+        },
+        fn: () => {
+          for (const entry of schema) {
+            MenuDropdown(entry);
+          }
+        },
+      });
+
+      h("span", {
+        text: title,
+        fn() {
+          basicTextStyle({
+            class: "flex items-center justify-center",
+          });
+        },
+      });
+
+      h("span", {});
     },
   });
 };

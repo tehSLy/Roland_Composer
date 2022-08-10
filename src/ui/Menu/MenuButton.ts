@@ -1,7 +1,7 @@
 import { createStore, is } from "effector";
 import { styled } from "foliage";
 import { spec, StoreOrData } from "forest";
-import { menuLabelStyle } from "./menuLabelStyle";
+import { basicTextStyle } from "../shared/styles/basicTextStyle";
 
 export const MenuButton = ({
   text,
@@ -22,14 +22,14 @@ export const MenuButton = ({
       text,
     });
 
-    menuLabelStyle({
+    basicTextStyle({
       class:
-        "rounded-md px-2 py-1 hover:bg-gray-500 disabled:text-gray-800 disabled:hover:bg-inherit",
+        "rounded-md px-2 py-1 hover:bg-gray-500 disabled:text-gray-800 disabled:hover:bg-inherit disabled:cursor-default",
     });
   });
 };
 
 const Btn = styled.button`
-  cursor: pointer;
+  /* cursor: pointer; */
   user-select: none;
 `;

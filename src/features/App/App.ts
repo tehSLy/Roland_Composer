@@ -2,6 +2,7 @@ import { StyledRoot } from "foliage";
 import { h, node, spec } from "forest";
 import { debounce } from "patronum/debounce";
 import { AppModel } from "../AppModel";
+import { AboutModal } from "./AboutModal";
 import { History, historyAction } from "./History";
 import { KeyMapping } from "./KeyMapping";
 import { LoadingIndicator } from "./LoadingIndicator";
@@ -50,5 +51,7 @@ export const App = ({ appModel }: Config) => {
   });
   Menu({ appModel });
 
-  // Modal();
+  AboutModal({
+    model: appModel.uiModel.aboutModal,
+  });
 };

@@ -7,6 +7,7 @@ const filePickerApiAvailable =
 
 export const Menu = ({ appModel }: { appModel: AppModel }) => {
   MenuBar({
+    title: appModel.projectName,
     schema: [
       {
         label: "Menu",
@@ -29,6 +30,10 @@ export const Menu = ({ appModel }: { appModel: AppModel }) => {
           {
             label: "Render...",
             disabled: true,
+          },
+          {
+            label: "Share...",
+            handler: appModel.share,
           },
         ],
       },
@@ -113,7 +118,7 @@ export const Menu = ({ appModel }: { appModel: AppModel }) => {
           },
           {
             label: "About...",
-            disabled: true,
+            handler: appModel.uiModel.aboutModal.open,
           },
         ],
       },

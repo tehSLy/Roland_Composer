@@ -1,0 +1,1 @@
+export { basicTextStyleClass } from "./textStyleClass";

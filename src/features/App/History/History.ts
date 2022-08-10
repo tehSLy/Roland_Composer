@@ -1,7 +1,7 @@
 import classNames from "classnames";
 import { createStore, Event, merge, Store } from "effector";
 import { h, list, remap, spec } from "forest";
-import { menuLabelStyle } from "../../../ui/Menu/menuLabelStyle";
+import { basicTextStyle } from "../../../ui/shared/styles/basicTextStyle";
 import {
   ABMode,
   InstrumentsKeys,
@@ -32,7 +32,7 @@ export const History = <A extends Event<HistoryAction>[]>({
       height: "calc(100vh - 2.25rem)",
     },
     fn: () => {
-      menuLabelStyle({
+      basicTextStyle({
         class: "absolute bg-neutral-600 w-48 no-scrollbar overflow-y-auto",
       });
       h("div", {

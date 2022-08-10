@@ -448,6 +448,7 @@ export const createRoland808Model = (config?: {
     snapshot: {
       make: fxMakeSnapshot,
       load: loadSnapshot,
+      state: combine(snapShotMap),
     },
   };
 };

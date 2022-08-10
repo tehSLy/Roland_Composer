@@ -1,0 +1,2 @@
+export { basicTextStyleClass } from './styles';
+

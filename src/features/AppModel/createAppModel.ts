@@ -1,4 +1,12 @@
-import { combine, createEffect, createEvent, forward, sample } from "effector";
+import {
+  attach,
+  combine,
+  createEffect,
+  createEvent,
+  createStore,
+  forward,
+  sample,
+} from "effector";
 import {
   bindPlayerToControls,
   createClickManager,
@@ -17,13 +25,17 @@ import { createScene } from "../Scene";
 import { keymapping } from "../shared";
 import { createUIModel } from "./createUIModel";
 
+const defaultName = "Untitled";
+
 export const createAppModel = () => {
+  const $projectName = createStore(defaultName);
   const init = createEvent();
   const sceneModel = createScene();
 
   const model = createRoland3DModel();
   const intersectionsManager = createIntersectionsManager({
     camera: sceneModel.camera,
+    canvasElement: sceneModel.renderer.domElement,
   });
   const dragManager = createDragManager({ intersectionsManager });
   const clickManager = createClickManager({ intersectionsManager });
@@ -32,17 +44,42 @@ export const createAppModel = () => {
     intersectionsManager,
     dragManager,
   });
-  const player = createRoland808Model({});
+  const composer = createRoland808Model({});
   const $isLoadingAssets = combine(
     model.isLoaded,
-    player.isLoaded,
+    composer.isLoaded,
     (...assets) => assets.some((v) => !v)
   );
+
+  const fxShare = attach({
+    source: { snapshot: composer.snapshot.state, name: $projectName },
+    effect({ name, snapshot }) {
+      const encodedSnapshot = encodeURIComponent(
+        btoa(JSON.stringify(snapshot))
+      );
+      navigator.share({
+        url: `${location.origin}?snapshot=${encodedSnapshot}`,
+        title: `My Roland TR-808 Composition: ${name}`,
+      });
+    },
+  });
+
+  const fxParseSnapshotFromUrl = createEffect(() => {
+    const search = new URLSearchParams(location.search);
+    const snapshot = search.get("snapshot");
+
+    if (!snapshot) {
+      return;
+    }
+    console.log(atob(decodeURIComponent(snapshot)));
+
+    return JSON.parse(atob(decodeURIComponent(snapshot)));
+  });
 
   const uiModel = createUIModel();
 
   const fxExport = createEffect(async (_: void) => {
-    const snapshot = await player.snapshot.make();
+    const snapshot = await composer.snapshot.make();
     const blob = new Blob([JSON.stringify(snapshot)], {
       type: "application/json",
     });
@@ -65,6 +102,14 @@ export const createAppModel = () => {
     await writableFileStream.close();
   });
 
+  const fxResolveProjectName = createEffect((filename: string) => {
+    try {
+      return filenameRegexp.exec(filename)?.[1] ?? defaultName;
+    } catch (error) {
+      return defaultName;
+    }
+  });
+
   const fxImport = createEffect(async () => {
     const pickerOptions = {
       types: [
@@ -79,17 +124,30 @@ export const createAppModel = () => {
     // @ts-ignore
     const [fileHandle] = await window.showOpenFilePicker(pickerOptions);
     const file = await fileHandle.getFile();
-    return file.text().then(JSON.parse) as Promise<ComposerSnapshot>;
+    const name = await fxResolveProjectName(file.name);
+
+    return {
+      snapshot: (await file.text().then(JSON.parse)) as ComposerSnapshot,
+      name,
+    };
   });
 
   sample({
-    clock: fxImport.doneData,
-    target: player.snapshot.load,
+    clock: fxImport.doneData.map(({ snapshot }) => snapshot),
+    target: composer.snapshot.load,
+  });
+  sample({
+    clock: fxImport.doneData.map(({ name }) => name),
+    target: $projectName,
+  });
+  sample({
+    clock: fxParseSnapshotFromUrl.doneData,
+    target: composer.snapshot.load,
   });
 
   createKeyPressManager({
     keyMap: keymapping,
-    player,
+    player: composer,
   });
 
   disableCameraControlsUponDrag({
@@ -103,6 +161,7 @@ export const createAppModel = () => {
       model.loadModel,
       sceneModel.ticker.start,
       dragManager.addEventListeners,
+      fxParseSnapshotFromUrl,
     ],
   });
 
@@ -121,7 +180,7 @@ export const createAppModel = () => {
         clickManager,
         controlsModel,
         dragManager,
-        player,
+        player: composer,
       })),
     ],
   });
@@ -133,7 +192,7 @@ export const createAppModel = () => {
   forward({ from: sceneModel.ticker.tick, to: intersectionsManager.render });
 
   return {
-    deviceModel: player,
+    deviceModel: composer,
     intersectionsManager,
     dragManager,
     clickManager,
@@ -144,8 +203,12 @@ export const createAppModel = () => {
     uiModel,
     export: fxExport,
     import: fxImport,
+    share: fxShare,
+    projectName: $projectName,
   };
 };
+
+const filenameRegexp = /(.+)\.(?:.*)/;
 
 const gatherObjects = (controls: Record<string, any>) => {
   return Object.values(controls).flat();

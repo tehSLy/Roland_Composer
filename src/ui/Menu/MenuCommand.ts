@@ -11,8 +11,8 @@ import {
 import { h, spec, StoreOrData } from "forest";
 import { hover } from "../../lib/forest-html";
 import { storeOrDataToStore } from "../../lib/storeOrDataToStore";
+import { basicTextStyle } from "../shared/styles/basicTextStyle";
 import { StaticDropdownList } from "./DropdownList";
-import { menuLabelStyle } from "./menuLabelStyle";
 
 export const MenuCommand = ({
   label,
@@ -33,12 +33,15 @@ export const MenuCommand = ({
     });
   }
 
-  h("div", () => {
-    menuLabelStyle({
+  h("button", () => {
+    basicTextStyle({
       class: $isDisabled.map((disabled) =>
-        classNames("px-5 py-1 flex justify-between gap-x-4 relative", {
-          "hover:text-gray-100 hover:bg-slate-500": !disabled,
-        })
+        classNames(
+          "px-5 py-1 flex justify-between gap-x-4 relative w-full disabled:cursor-default",
+          {
+            "hover:text-gray-100 hover:bg-slate-500": !disabled,
+          }
+        )
       ),
       textColor: $isDisabled.map((is) =>
         is ? ("text-neutral-400" as string) : null
@@ -59,7 +62,6 @@ export const MenuCommand = ({
 
     spec({
       style: {
-        cursor: "pointer",
         userSelect: "none",
       },
       attr: {

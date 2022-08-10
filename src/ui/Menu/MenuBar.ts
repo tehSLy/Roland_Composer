@@ -17,7 +17,7 @@ export const MenuBar = ({
     fn: () => {
       h("div", {
         attr: {
-          class: "flex flex-row h-9 absolute left-0",
+          class: "flex flex-row h-9 absolute left-1",
         },
         fn: () => {
           for (const entry of schema) {

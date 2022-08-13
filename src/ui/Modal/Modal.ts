@@ -1,4 +1,4 @@
-import { createEvent, Event, sample } from "effector";
+import { createEvent, Event, sample, Unit } from "effector";
 import { h, node, spec, StoreOrData } from "forest";
 import { storeOrDataToStore } from "../../lib/storeOrDataToStore";
 import { basicTextStyle } from "../shared/styles/basicTextStyle";
@@ -6,8 +6,9 @@ import { ModalModel } from "./createModalModel";
 
 export type ModalButtonConfig = {
   label: StoreOrData<string>;
-  disabled: StoreOrData<boolean>;
-  visible: StoreOrData<boolean>;
+  disabled?: StoreOrData<boolean>;
+  visible?: StoreOrData<boolean>;
+  handler: Unit<any>;
 };
 
 export function Modal(config: {
@@ -48,6 +49,7 @@ export function Modal(config: {
       basicTextStyle({
         class: "fixed z-10 inset-0 overflow-y-auto",
       });
+      document.addEventListener("keydown", console.log);
 
       spec({
         visible: $open,
@@ -67,7 +69,7 @@ export function Modal(config: {
           h("div", {
             attr: {
               class:
-                "relative bg-neutral-600 text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:max-w-lg sm:w-full",
+                "relative bg-neutral-600 text-left overflow-hidden shadow-xl transform transition-all sm:max-w-lg sm:w-full mb-32 mt-8",
             },
             fn() {
               ModalHeader({
@@ -76,6 +78,29 @@ export function Modal(config: {
               });
               ModalContent({
                 content: modalContent,
+              });
+              h("div", {
+                attr: {
+                  class: "px-1 flex items-center justify-end pb-1",
+                },
+                fn() {
+                  if (config.buttons instanceof Array) {
+                    for (const button of config.buttons) {
+                      h("button", {
+                        attr: {
+                          class:
+                            "rounded-md px-2 py-1 hover:bg-gray-500 disabled:text-gray-800 disabled:hover:bg-inherit disabled:cursor-default",
+                        },
+                        text: button.label,
+                        handler: {
+                          click: button.handler.prepend(
+                            () => null
+                          ) as Event<any>,
+                        },
+                      });
+                    }
+                  }
+                },
               });
             },
           });
@@ -89,6 +114,7 @@ function ModalBackdrop(config?: { visible?: StoreOrData<boolean> }) {
   h("div", {
     attr: {
       class: "fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity",
+      hidden: storeOrDataToStore(config?.visible, false).map((v) => !v) // for some reason visible prop doesn't work
     },
     visible: storeOrDataToStore(config?.visible, false),
   });
@@ -141,3 +167,7 @@ function ModalContent({ content }: { content: () => void }) {
     content();
   });
 }
+
+export type ModalButton = {
+  label: StoreOrData<string>;
+};

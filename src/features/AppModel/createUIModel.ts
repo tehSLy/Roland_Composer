@@ -1,4 +1,4 @@
-import { createEvent, createStore } from "effector";
+import { combine, createEvent, createStore } from "effector";
 import { createModalModel } from "../../ui/Modal";
 
 export const createUIModel = () => {
@@ -14,9 +14,16 @@ export const createUIModel = () => {
     (is) => !is
   );
 
-  const aboutModal = createModalModel({
-    isOpen: false,
+  const aboutModal = createModalModel({});
+  const saveModal = createModalModel({
+    isOpen: true,
   });
+  const loadModal = createModalModel({});
+
+  const $isModalOpened = combine(
+    [aboutModal.isOpen, saveModal.isOpen, loadModal.isOpen],
+    (params) => params.some(Boolean)
+  );
 
   return {
     toggleKeybindingsVisible,
@@ -24,6 +31,9 @@ export const createUIModel = () => {
     toggleHistoryVisible,
     historyVisible: $historyVisible,
     aboutModal,
+    saveModal,
+    loadModal,
+    isModalOpened: $isModalOpened,
   };
 };
 

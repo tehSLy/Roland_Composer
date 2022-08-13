@@ -5,6 +5,7 @@
   "homepage": "https://tehsly.github.io/roland-composer",
   "dependencies": {
     "classnames": "^2.3.1",
+    "effector-storage": "^5.0.1",
     "js-file-download": "^0.4.12",
     "lodash.debounce": "^4.0.8",
     "lodash.throttle": "^4.1.1",

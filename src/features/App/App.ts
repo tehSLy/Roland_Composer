@@ -7,6 +7,7 @@ import { History, historyAction } from "./History";
 import { KeyMapping } from "./KeyMapping";
 import { LoadingIndicator } from "./LoadingIndicator";
 import { Menu } from "./Menu";
+import { LoadModal, SaveModal } from "./SaveLoadModal";
 
 type Config = {
   appModel: AppModel;
@@ -53,5 +54,11 @@ export const App = ({ appModel }: Config) => {
 
   AboutModal({
     model: appModel.uiModel.aboutModal,
+  });
+  SaveModal({
+    appModel,
+  });
+  LoadModal({
+    appModel,
   });
 };

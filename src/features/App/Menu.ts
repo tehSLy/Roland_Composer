@@ -14,8 +14,12 @@ export const Menu = ({ appModel }: { appModel: AppModel }) => {
         children: [
           {
             label: "Save...",
-            shortcut: "Ctrl + S",
-            disabled: true,
+            // shortcut: "Ctrl + S",
+            handler: appModel.uiModel.saveModal.open,
+          },
+          {
+            label: "Load...",
+            handler: appModel.uiModel.loadModal.open,
           },
           {
             label: "Import...",

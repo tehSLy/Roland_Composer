@@ -15,9 +15,7 @@ export const createUIModel = () => {
   );
 
   const aboutModal = createModalModel({});
-  const saveModal = createModalModel({
-    isOpen: true,
-  });
+  const saveModal = createModalModel({});
   const loadModal = createModalModel({});
 
   const $isModalOpened = combine(

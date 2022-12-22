@@ -1,10 +1,10 @@
 import {
   attach,
-  createEffect,
   createEvent,
   createStore,
   guard,
   split,
+  Store,
 } from "effector";
 import { KeyAction, KeyMap } from "../../shared";
 import { instrumentsChain, playerModes } from "../shared/constants";
@@ -15,6 +15,7 @@ type Mode = "mute" | "instrument" | "mode" | "bpm" | "volume" | "togglePad";
 type Config = {
   keyMap: KeyMap;
   player: DeviceModel;
+  suppressed?: Store<boolean>;
 };
 
 const actionToModeMap: Partial<Record<KeyAction, Mode>> = {
@@ -25,16 +26,25 @@ const actionToModeMap: Partial<Record<KeyAction, Mode>> = {
   modeBpm: "bpm",
 };
 
-export const createKeyPressManager = ({ keyMap, player }: Config) => {
+export const createKeyPressManager = ({
+  keyMap,
+  player,
+  suppressed,
+}: Config) => {
   const $mode = createStore<Mode>("togglePad");
   const padPressed = createEvent<number>();
+  const $suppressed = suppressed ?? createStore(false);
 
-  const fxResolveAction = createEffect((event: KeyboardEvent) => {
-    if (event.uiEvent) {
-      return;
-    }
-    return keyMap[eventToString(event)];
+  const fxResolveAction = attach({
+    source: $suppressed,
+    effect: (isSuppressed, event: KeyboardEvent) => {
+      if (event.uiEvent || isSuppressed) {
+        return;
+      }
+      return keyMap[eventToString(event)];
+    },
   });
+
   const fxKeyPressed = attach({ effect: fxResolveAction });
   const fxModeSet = attach({ effect: fxResolveAction });
   const fxModeRelease = attach({ effect: fxResolveAction });

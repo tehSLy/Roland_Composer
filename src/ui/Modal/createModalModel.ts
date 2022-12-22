@@ -14,6 +14,8 @@ export const createModalModel = (config: { isOpen?: StoreOrData<boolean> }) => {
     toggle: (v) => !v,
   });
 
+$open.watch(console.log)
+
   return {
     isOpen: $open,
     open,

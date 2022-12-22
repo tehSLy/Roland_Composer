@@ -7,6 +7,7 @@ import {
   forward,
   sample,
 } from "effector";
+import { persist } from "effector-storage/local";
 import {
   bindPlayerToControls,
   createClickManager,
@@ -132,8 +133,57 @@ export const createAppModel = () => {
     };
   });
 
+  const $savedProjects = createStore<Record<string, ComposerSnapshot>>({});
+  const fxLoad = attach({
+    source: $savedProjects,
+    effect(projects, name: string) {
+      const project = projects[name];
+      if (!project) {
+        throw new Error("Project not found");
+      }
+      return project;
+    },
+  });
+  const fxSave = attach({
+    source: composer.snapshot.state,
+    effect(state, filename: string) {
+      return { snapshot: state, filename };
+    },
+  });
+
+  const fxDelete = attach({
+    source: $savedProjects,
+    effect: (projects, name: string) => {
+      if (!name) {
+        throw new Error("");
+      }
+
+      if (!projects[name]) {
+        throw new Error("");
+      }
+
+      return name;
+    },
+  });
+  $savedProjects
+    .on(fxSave.doneData, (state, { filename, snapshot }) => ({
+      ...state,
+      [filename]: snapshot,
+    }))
+    .on(
+      fxDelete.doneData,
+      (state, name) => (
+        delete state[name],
+        {
+          ...state,
+        }
+      )
+    );
+
+  persist({ store: $savedProjects, key: "savedProjects" });
+
   sample({
-    clock: fxImport.doneData.map(({ snapshot }) => snapshot),
+    clock: [fxImport.doneData.map(({ snapshot }) => snapshot), fxLoad.doneData],
     target: composer.snapshot.load,
   });
   sample({
@@ -148,6 +198,7 @@ export const createAppModel = () => {
   createKeyPressManager({
     keyMap: keymapping,
     player: composer,
+    suppressed: uiModel.isModalOpened,
   });
 
   disableCameraControlsUponDrag({
@@ -205,6 +256,12 @@ export const createAppModel = () => {
     import: fxImport,
     share: fxShare,
     projectName: $projectName,
+    savedProjects: {
+      list: $savedProjects,
+      save: fxSave,
+      load: fxLoad,
+      delete: fxDelete,
+    },
   };
 };
 

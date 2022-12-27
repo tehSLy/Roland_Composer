@@ -3,7 +3,6 @@ import { useEffect, useRef } from 'react';
 import { AppModel } from '../../AppModel';
 import { AppBar } from '../ui/app-bar';
 import { LoadingIndicator } from '../ui/loading-indicator';
-import { Menu } from '../ui/menu';
 
 type AppProps = {
   appModel: AppModel;
@@ -11,18 +10,19 @@ type AppProps = {
 
 export const App = ({ appModel }: AppProps) => {
   const isAppLoading = useStore(appModel.isLoading);
-  const projectName = useStore(appModel.projectName);
   const sceneElementRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    appModel.sceneModel.bindElement(sceneElementRef.current as HTMLDivElement);
+    appModel.init();
+
+    if (!sceneElementRef.current) return;
+    appModel.sceneModel.bindElement(sceneElementRef.current);
   }, []);
 
   return (
     <>
       <LoadingIndicator isVisible={isAppLoading} />
-      <AppBar appModel={appModel} title={projectName} />
-      <Menu></Menu>
+      <AppBar appModel={appModel} />
       <div ref={sceneElementRef}></div>
     </>
   );

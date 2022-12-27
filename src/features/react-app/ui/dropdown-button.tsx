@@ -12,16 +12,14 @@ export const DropdownButton = ({ title, children }: DropdownButtonProps) => {
 
   return (
     <span
-      className='relative'
+      className='relative inline-block'
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
       <Button>
         <Typography>{title}</Typography>
       </Button>
-      {isHovered ? (
-        <div className='absolute top-6 left-0 py-1 '>{children}</div>
-      ) : null}
+      {isHovered ? <div className='absolute left-0 '>{children}</div> : null}
     </span>
   );
 };

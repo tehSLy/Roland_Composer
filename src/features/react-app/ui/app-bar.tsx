@@ -10,8 +10,6 @@ type AppBarProps = {
 };
 
 export const AppBar = ({ appModel }: AppBarProps) => {
-  const projectName = useStore(appModel.projectName);
-
   const schema = useMemo(() => createSchema(appModel), [appModel]);
 
   return (
@@ -20,8 +18,13 @@ export const AppBar = ({ appModel }: AppBarProps) => {
         <Menu schema={schema} />
       </div>
       <div className='absolute'>
-        <Typography>{projectName}</Typography>
+        <ProjectName appModel={appModel} />
       </div>
     </div>
   );
+};
+
+const ProjectName = ({ appModel }: { appModel: AppModel }) => {
+  const projectName = useStore(appModel.projectName);
+  return <Typography>{projectName}</Typography>;
 };

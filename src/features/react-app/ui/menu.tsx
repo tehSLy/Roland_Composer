@@ -30,29 +30,11 @@ export const Menu = ({ schema }: MenuProps) => {
                 );
               }
 
-              return dropdownMenuItem.meta.url ? (
-                <a href={dropdownMenuItem.meta.url}>
-                  <MenuItem disabled={dropdownMenuItem.disabled}>
-                    {dropdownMenuItem.label}
-                    {dropdownMenuItem.shortcut && (
-                      <span>{dropdownMenuItem.shortcut}</span>
-                    )}
-                    {dropdownMenuItem.meta.type === 'number' && (
-                      <Input
-                        width='16'
-                        type='number'
-                        value={dropdownMenuItem.meta.value}
-                        onChange={(evt) =>
-                          dropdownMenuItem.meta.handler?.(
-                            Number(evt.currentTarget.value)
-                          )
-                        }
-                      />
-                    )}
-                  </MenuItem>
-                </a>
-              ) : (
-                <MenuItem disabled={dropdownMenuItem.disabled}>
+              return (
+                <MenuItem
+                  disabled={dropdownMenuItem.disabled}
+                  href={dropdownMenuItem.meta.url}
+                >
                   {dropdownMenuItem.label}
                   {dropdownMenuItem.shortcut && (
                     <span>{dropdownMenuItem.shortcut}</span>

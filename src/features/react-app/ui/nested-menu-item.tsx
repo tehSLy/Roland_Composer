@@ -2,8 +2,7 @@ import { useState } from 'react';
 import classNames from 'classnames';
 import { MenuItem } from './menu-item';
 
-interface NestedMenuItemProps
-  extends React.ComponentPropsWithoutRef<'button'> {}
+interface NestedMenuItemProps extends React.ComponentPropsWithoutRef<'a'> {}
 
 export const NestedMenuItem = ({
   title,

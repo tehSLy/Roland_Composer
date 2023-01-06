@@ -1,3 +1,4 @@
+import { ElementType } from 'react';
 import { MenuItemSchema } from '../create-schema';
 import { DropdownButton } from './dropdown-button';
 import { Input } from './input';
@@ -30,10 +31,12 @@ export const Menu = ({ schema }: MenuProps) => {
                 );
               }
 
+              const additionalProps = dropdownMenuItem.meta.url ? {as: 'a' as ElementType, href: dropdownMenuItem.meta.url} : {}
+              
               return (
                 <MenuItem
-                  disabled={dropdownMenuItem.disabled}
-                  href={dropdownMenuItem.meta.url}
+                disabled={dropdownMenuItem.disabled}
+                {...additionalProps}
                 >
                   {dropdownMenuItem.label}
                   {dropdownMenuItem.shortcut && (

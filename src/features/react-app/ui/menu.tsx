@@ -31,12 +31,12 @@ export const Menu = ({ schema }: MenuProps) => {
                 );
               }
 
-              const additionalProps = dropdownMenuItem.meta.url ? {as: 'a' as ElementType, href: dropdownMenuItem.meta.url} : {}
+          
               
               return (
                 <MenuItem
+                href={dropdownMenuItem.meta.url}
                 disabled={dropdownMenuItem.disabled}
-                {...additionalProps}
                 >
                   {dropdownMenuItem.label}
                   {dropdownMenuItem.shortcut && (

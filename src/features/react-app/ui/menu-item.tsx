@@ -1,16 +1,16 @@
 import * as React from "react";
 import classNames from 'classnames';
 
-type MenuItem2Props = {
+type MenuItemProps = {
   href?: string;
   selected?: boolean;
   disabled?: boolean;
   children?: React.ReactNode
 }
 
-export const MenuItem = ({href, selected, disabled, children, ...props}: MenuItem2Props) => {
+export const MenuItem = ({href, selected, disabled, children, ...props}: MenuItemProps) => {
   const Component = href ? 'a' : "li";
-  const additionalProps = href ? {...props, href} : {...props}
+  const additionalProps = href ? {...props, href} : props
 
   return <Component {...additionalProps} className={classNames(
     `whitespace-nowrap cursor-pointer text-left px-5 py-1 w-full flex justify-between gap-x-4 font-sans tracking-tight text-sm  ${

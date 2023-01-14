@@ -1,13 +1,13 @@
-import { StyledRoot } from "foliage";
-import { h, node, spec } from "forest";
-import { debounce } from "patronum/debounce";
-import { AppModel } from "../AppModel";
-import { AboutModal } from "./AboutModal";
-import { History, historyAction } from "./History";
-import { KeyMapping } from "./KeyMapping";
-import { LoadingIndicator } from "./LoadingIndicator";
-import { Menu } from "./Menu";
-import { LoadModal, SaveModal } from "./SaveLoadModal";
+import { StyledRoot } from 'foliage';
+import { h, node, spec } from 'forest';
+import { debounce } from 'patronum/debounce';
+import { AppModel } from '../AppModel';
+import { AboutModal } from './AboutModal';
+import { History, historyAction } from './History';
+import { KeyMapping } from './KeyMapping';
+import { LoadingIndicator } from './LoadingIndicator';
+import { Menu } from './Menu';
+import { LoadModal, SaveModal } from './SaveLoadModal';
 
 type Config = {
   appModel: AppModel;
@@ -44,7 +44,7 @@ export const App = ({ appModel }: Config) => {
   KeyMapping({
     visible: appModel.uiModel.keybindingsVisible,
   });
-  h("div", () => {
+  h('div', () => {
     node((el) => appModel.sceneModel.bindElement(el as HTMLElement));
     spec({
       visible: appModel.isLoading.map((v) => !v),

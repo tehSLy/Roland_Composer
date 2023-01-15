@@ -20,7 +20,9 @@ export const MenuItem = ({
 
   return (
     <Component {...additionalProps}>
-      <MenuItemStyled>{children}</MenuItemStyled>
+      <MenuItemStyled disabled={disabled} selected={selected}>
+        {children}
+      </MenuItemStyled>
     </Component>
   );
 };
@@ -38,6 +40,7 @@ const MenuItemStyled = tw.span<MenuItemProps>`
   font-sans
   tracking-tight
   text-sm 
+  hover:bg-slate-500 
   ${({ disabled }) =>
     disabled
       ? 'text-neutral-400 hover:bg-inherit cursor-default'

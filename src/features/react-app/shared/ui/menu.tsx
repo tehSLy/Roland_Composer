@@ -1,4 +1,3 @@
-import { ElementType } from 'react';
 import { MenuItemSchema } from '../create-schema';
 import { DropdownButton } from './dropdown-button';
 import { Input } from './input';
@@ -13,17 +12,17 @@ type MenuProps = {
 export const Menu = ({ schema }: MenuProps) => {
   return (
     <>
-      {schema.map((menuItem) => (
+      {schema.map(menuItem => (
         <DropdownButton title={menuItem.label}>
           <MenuList>
-            {menuItem.children.map((dropdownMenuItem) => {
+            {menuItem.children.map(dropdownMenuItem => {
               const { meta } = dropdownMenuItem;
 
               if (meta.children) {
                 return (
                   <NestedMenuItem title={dropdownMenuItem.label}>
                     <MenuList>
-                      {meta.children.map((nestedMenuItem) => (
+                      {meta.children.map(nestedMenuItem => (
                         <MenuItem>{nestedMenuItem.label}</MenuItem>
                       ))}
                     </MenuList>
@@ -31,12 +30,10 @@ export const Menu = ({ schema }: MenuProps) => {
                 );
               }
 
-          
-              
               return (
                 <MenuItem
-                href={dropdownMenuItem.meta.url}
-                disabled={dropdownMenuItem.disabled}
+                  href={dropdownMenuItem.meta.url}
+                  disabled={dropdownMenuItem.disabled}
                 >
                   {dropdownMenuItem.label}
                   {dropdownMenuItem.shortcut && (
@@ -47,7 +44,7 @@ export const Menu = ({ schema }: MenuProps) => {
                       width='16'
                       type='number'
                       value={dropdownMenuItem.meta.value}
-                      onChange={(evt) =>
+                      onChange={evt =>
                         dropdownMenuItem.meta.handler?.(
                           Number(evt.currentTarget.value)
                         )

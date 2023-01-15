@@ -1,6 +1,6 @@
 import { Store, Event } from 'effector';
-import { AppModel } from '../AppModel';
-import { resolveKeyLabel, resolveShortcut } from '../shared';
+import { AppModel } from '../../AppModel';
+import { resolveKeyLabel, resolveShortcut } from '../../shared';
 
 type MenuItemChildrenSchema = {
   label?: string;

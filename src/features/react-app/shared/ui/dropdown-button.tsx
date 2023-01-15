@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Button } from './button';
 import { Typography } from './typography';
+import tw from 'tailwind-styled-components';
 
 type DropdownButtonProps = {
   title: string;
@@ -11,15 +12,24 @@ export const DropdownButton = ({ title, children }: DropdownButtonProps) => {
   const [isHovered, setIsHovered] = useState(false);
 
   return (
-    <span
-      className='relative inline-block'
+    <DropdownWrapper
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
       <Button>
         <Typography>{title}</Typography>
       </Button>
-      {isHovered ? <div className='absolute left-0 '>{children}</div> : null}
-    </span>
+      {isHovered && <DropdownListWrapper>{children}</DropdownListWrapper>}
+    </DropdownWrapper>
   );
 };
+
+const DropdownWrapper = tw.span`
+  relative
+  inline-block
+`;
+
+const DropdownListWrapper = tw.div`
+  absolute
+  left-0
+`;

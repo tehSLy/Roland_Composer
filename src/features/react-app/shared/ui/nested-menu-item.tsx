@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import classNames from 'classnames';
 import { MenuItem } from './menu-item';
+import tw from 'tailwind-styled-components';
 
 interface NestedMenuItemProps extends React.ComponentPropsWithoutRef<'a'> {}
 
@@ -12,8 +12,7 @@ export const NestedMenuItem = ({
   const [isHovered, setIsHovered] = useState(false);
 
   return (
-    <span
-      className='relative'
+    <NestedMenuItemWrapper
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
@@ -21,11 +20,19 @@ export const NestedMenuItem = ({
         {title}
         <span>▸</span>
       </MenuItem>
-      {isHovered && (
-        <div className='absolute bg-neutral-700 rounded-sm left-full -top-1'>
-          {children}
-        </div>
-      )}
-    </span>
+      {isHovered && <NestedMenuWrapper>{children}</NestedMenuWrapper>}
+    </NestedMenuItemWrapper>
   );
 };
+
+const NestedMenuItemWrapper = tw.span`
+  relative
+`;
+
+const NestedMenuWrapper = tw.div`
+bg-neutral-700
+  rounded-sm
+  absolute
+  left-full
+  -top-1
+`;

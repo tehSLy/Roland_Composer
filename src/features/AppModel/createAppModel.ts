@@ -6,8 +6,8 @@ import {
   createStore,
   forward,
   sample,
-} from "effector";
-import { persist } from "effector-storage/local";
+} from 'effector';
+import { persist } from 'effector-storage/local';
 import {
   bindPlayerToControls,
   createClickManager,
@@ -20,13 +20,13 @@ import {
   createRoland808Model,
   disableCameraControlsUponDrag,
   resolveControls,
-} from "../Player";
-import { ComposerSnapshot } from "../Player/model/createPlayerModel";
-import { createScene } from "../Scene";
-import { keymapping } from "../shared";
-import { createUIModel } from "./createUIModel";
+} from '../Player';
+import { ComposerSnapshot } from '../Player/model/createPlayerModel';
+import { createScene } from '../Scene';
+import { keymapping } from '../shared';
+import { createUIModel } from './createUIModel';
 
-const defaultName = "Untitled";
+const defaultName = 'Untitled';
 
 export const createAppModel = () => {
   const $projectName = createStore(defaultName);
@@ -67,7 +67,7 @@ export const createAppModel = () => {
 
   const fxParseSnapshotFromUrl = createEffect(() => {
     const search = new URLSearchParams(location.search);
-    const snapshot = search.get("snapshot");
+    const snapshot = search.get('snapshot');
 
     if (!snapshot) {
       return;
@@ -82,15 +82,15 @@ export const createAppModel = () => {
   const fxExport = createEffect(async (_: void) => {
     const snapshot = await composer.snapshot.make();
     const blob = new Blob([JSON.stringify(snapshot)], {
-      type: "application/json",
+      type: 'application/json',
     });
     const pickerOptions = {
       suggestedName: `Untitled.json`,
       types: [
         {
-          description: "JSON File",
+          description: 'JSON File',
           accept: {
-            "application/json": [".json", ".txt"],
+            'application/json': ['.json', '.txt'],
           },
         },
       ],
@@ -115,9 +115,9 @@ export const createAppModel = () => {
     const pickerOptions = {
       types: [
         {
-          description: "JSON File",
+          description: 'JSON File',
           accept: {
-            "application/json": [".json", ".txt"],
+            'application/json': ['.json', '.txt'],
           },
         },
       ],
@@ -139,7 +139,7 @@ export const createAppModel = () => {
     effect(projects, name: string) {
       const project = projects[name];
       if (!project) {
-        throw new Error("Project not found");
+        throw new Error('Project not found');
       }
       return project;
     },
@@ -155,11 +155,11 @@ export const createAppModel = () => {
     source: $savedProjects,
     effect: (projects, name: string) => {
       if (!name) {
-        throw new Error("");
+        throw new Error('');
       }
 
       if (!projects[name]) {
-        throw new Error("");
+        throw new Error('');
       }
 
       return name;
@@ -180,7 +180,7 @@ export const createAppModel = () => {
       )
     );
 
-  persist({ store: $savedProjects, key: "savedProjects" });
+  persist({ store: $savedProjects, key: 'savedProjects' });
 
   sample({
     clock: [fxImport.doneData.map(({ snapshot }) => snapshot), fxLoad.doneData],
@@ -272,3 +272,5 @@ const gatherObjects = (controls: Record<string, any>) => {
 };
 
 export type AppModel = ReturnType<typeof createAppModel>;
+
+export const appModel = createAppModel();

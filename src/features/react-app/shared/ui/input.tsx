@@ -1,19 +1,10 @@
-import { useStore } from 'effector-react';
-import { Store } from 'effector';
 import tw from 'tailwind-styled-components';
 
-interface InputProps extends React.ComponentPropsWithoutRef<'input'> {
+type InputProps = {
   width?: string;
-  value: any;
-}
-
-export const Input = ({ value, width = 'auto', ...props }: InputProps) => {
-  const storeValue = useStore(value as Store<string>);
-
-  return <InputStyled {...props} value={storeValue} width={width} />;
 };
 
-const InputStyled = tw.input<InputProps>`
+export const Input = tw.input<InputProps>`
   ${({ width }) => `w-${width}`}
   rounded-sm
   focus:outline-none

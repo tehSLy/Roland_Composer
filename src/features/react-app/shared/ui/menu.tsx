@@ -1,62 +1,54 @@
-import { MenuItemSchema } from '../create-schema';
-import { DropdownButton } from './dropdown-button';
-import { Input } from './input';
+import { Button } from './button';
+import { Dropdown } from './dropdown';
 import { MenuItem } from './menu-item';
-import { MenuList } from './menu-list';
-import { NestedMenuItem } from './nested-menu-item';
+import { useState } from 'react';
+import { MenuItemSchema } from '../types';
+import tw from 'tailwind-styled-components';
 
 type MenuProps = {
-  schema: MenuItemSchema[];
+  items?: MenuItemSchema[];
+  horizontal?: boolean;
 };
 
-export const Menu = ({ schema }: MenuProps) => {
+export const Menu = ({ items, horizontal }: MenuProps) => {
+  if (!items) return null;
+
+  const [isNestedSelected, setIsNestedSelected] = useState(false);
+
   return (
-    <>
-      {schema.map(menuItem => (
-        <DropdownButton title={menuItem.label}>
-          <MenuList>
-            {menuItem.children.map(dropdownMenuItem => {
-              const { meta } = dropdownMenuItem;
+    <MenuWrapper horizontal={horizontal}>
+      {items.map((item) => {
+        const { label, type, children, ...restProps } = item;
 
-              if (meta.children) {
-                return (
-                  <NestedMenuItem title={dropdownMenuItem.label}>
-                    <MenuList>
-                      {meta.children.map(nestedMenuItem => (
-                        <MenuItem>{nestedMenuItem.label}</MenuItem>
-                      ))}
-                    </MenuList>
-                  </NestedMenuItem>
-                );
-              }
+        if (!children) return <MenuItem title={label} {...restProps} />;
 
-              return (
-                <MenuItem
-                  href={dropdownMenuItem.meta.url}
-                  disabled={dropdownMenuItem.disabled}
-                >
-                  {dropdownMenuItem.label}
-                  {dropdownMenuItem.shortcut && (
-                    <span>{dropdownMenuItem.shortcut}</span>
-                  )}
-                  {dropdownMenuItem.meta.type === 'number' && (
-                    <Input
-                      width='16'
-                      type='number'
-                      value={dropdownMenuItem.meta.value}
-                      onChange={evt =>
-                        dropdownMenuItem.meta.handler?.(
-                          Number(evt.currentTarget.value)
-                        )
-                      }
-                    />
-                  )}
-                </MenuItem>
-              );
-            })}
-          </MenuList>
-        </DropdownButton>
-      ))}
-    </>
+        if (type === 'button') {
+          return (
+            <Dropdown menu={<Menu items={children} />} placement="bottomLeft">
+              <Button>{label}</Button>
+            </Dropdown>
+          );
+        }
+
+        return (
+          <Dropdown
+            menu={<Menu items={children} />}
+            onMouseEnter={() => setIsNestedSelected(true)}
+            onMouseLeave={() => setIsNestedSelected(false)}
+            placement="rightTop"
+          >
+            <MenuItem
+              title={label}
+              selected={isNestedSelected}
+              {...restProps}
+            />
+          </Dropdown>
+        );
+      })}
+    </MenuWrapper>
   );
 };
+
+const MenuWrapper = tw.ul<{ horizontal?: boolean }>`
+  ${({ horizontal }) => horizontal && 'flex'}
+`;

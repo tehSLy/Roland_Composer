@@ -1,11 +1,18 @@
+import { Store } from 'effector';
+import { KeyAction } from '../../shared';
+
 export type Placement = 'rightTop' | 'bottomLeft';
 
 export type MenuItemSchema = {
-  label?: string;
-  type?: 'button';
-  children?: MenuItemSchema[];
-  extra?: React.ReactNode;
+  label: string;
+  type?: 'button' | 'shortcut' | 'number' | 'submenu' | 'link';
   disabled?: boolean;
-  href?: string;
   onClick?: () => void;
+  onChange?: (a: any) => void;
+  meta: {
+    children?: MenuItemSchema[];
+    value?: Store<number>;
+    shortcut?: KeyAction;
+    href: string;
+  };
 };

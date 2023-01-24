@@ -1,53 +1,46 @@
-import { useState } from 'react';
 import { Placement } from '../types';
 import tw from 'tailwind-styled-components';
+import { TailwindInterface } from 'tailwind-styled-components/dist/tailwind';
 
 type DropdownProps = {
-  menu?: React.ReactNode;
+  anchorComponent?: React.ReactNode;
   placement?: Placement;
-  onMouseEnter?: () => void;
-  onMouseLeave?: () => void;
   children?: React.ReactNode;
 };
 
 export const Dropdown = ({
-  menu,
+  anchorComponent,
   placement = 'bottomLeft',
-  onMouseEnter = () => null,
-  onMouseLeave = () => null,
+
   children,
 }: DropdownProps) => {
-  const [isOpen, setIsOpen] = useState(false);
-
   return (
-    <DropdownWrapper
-      onMouseEnter={() => {
-        setIsOpen(true);
-        onMouseEnter();
-      }}
-      onMouseLeave={() => {
-        setIsOpen(false);
-        onMouseLeave();
-      }}
-    >
-      {children}
-      {isOpen && (
-        <DropdownMenuWrapper placement={placement}>{menu}</DropdownMenuWrapper>
-      )}
+    <DropdownWrapper>
+      {anchorComponent}
+      <DropdownMenuWrapper placement={placement}>
+        {children}
+      </DropdownMenuWrapper>
     </DropdownWrapper>
   );
 };
 
 const DropdownWrapper = tw.span`
   relative
+  [&:hover>*:nth-child(2)]:block
+  [&:hover>span]:bg-slate-500 
+  [&:hover>span]:text-gray-100 
 `;
 
 const DropdownMenuWrapper = tw.div<{ placement: Placement }>`
   absolute
   py-1
   rounded-sm
-  bg-neutral-700  
-
-  ${({ placement }) => (placement === 'rightTop' ? '-top-1 left-full' : '')}
-  ${({ placement }) => (placement === 'bottomLeft' ? 'left-0' : '')}
+  bg-neutral-700
+  hidden
+  ${({ placement }) => placementMap[placement]}
 `;
+
+const placementMap: Record<Placement, string> = {
+  rightTop: '-top-1 left-full',
+  bottomLeft: 'left-0',
+};

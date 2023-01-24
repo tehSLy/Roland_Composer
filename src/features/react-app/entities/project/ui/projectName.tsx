@@ -1,8 +1,12 @@
 import { useStore } from 'effector-react';
-import { appModel } from '../../../../AppModel/createAppModel';
-import { Typography } from '../../../shared/ui/typography';
+import { AppModel } from '../../../../AppModel/createAppModel';
+import { Typography } from '../../../shared/ui/Typography';
 
-export const ProjectName = () => {
+type ProjectNameProps = {
+  appModel: AppModel;
+};
+
+export const ProjectName = ({ appModel }: ProjectNameProps) => {
   const projectName = useStore(appModel.projectName);
 
   return <Typography>{projectName}</Typography>;

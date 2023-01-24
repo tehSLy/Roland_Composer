@@ -1,10 +1,14 @@
 import { useStore } from 'effector-react';
 import { useEffect, useRef } from 'react';
-import { AppBar } from '../widgets/app-bar/ui/app-bar';
-import { LoadingIndicator } from '../shared/ui/loading-indicator';
-import { appModel } from '../../AppModel/createAppModel';
+import { AppBar } from '../widgets/AppBar/ui/AppBar';
+import { LoadingIndicator } from '../shared/ui/LoadingIndicator';
+import { AppModel } from '../../AppModel/createAppModel';
 
-export const App = () => {
+type AppProps = {
+  appModel: AppModel;
+};
+
+export const App = ({ appModel }: AppProps) => {
   const isAppLoading = useStore(appModel.isLoading);
   const sceneElementRef = useRef<HTMLDivElement>(null);
 
@@ -18,7 +22,7 @@ export const App = () => {
   return (
     <>
       <LoadingIndicator isVisible={isAppLoading} />
-      <AppBar />
+      <AppBar appModel={appModel} />
       <div ref={sceneElementRef}></div>
     </>
   );

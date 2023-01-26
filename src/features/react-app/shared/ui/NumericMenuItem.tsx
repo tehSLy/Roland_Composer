@@ -1,7 +1,7 @@
 import { createStore, is, Store } from 'effector';
 import { useStore } from 'effector-react';
 import { Input } from './Input';
-import { MenuItemWrapper } from './MenuItem';
+import { MenuItemWrapper } from './MenuItemWrapper';
 
 type NumericMenuItemProps = {
   title: string;
@@ -9,15 +9,17 @@ type NumericMenuItemProps = {
   onChange?: React.ChangeEventHandler<HTMLInputElement>;
 };
 
-export const NumericMenuItem = (props: NumericMenuItemProps) => {
-  const { title, value = createStore(0), onChange = () => null } = props;
-
+export const NumericMenuItem = ({
+  title,
+  value = createStore(0),
+  onChange = () => null,
+}: NumericMenuItemProps) => {
   const storeValue = useStore(value);
 
   return (
     <MenuItemWrapper>
-      {title}
-      <Input value={storeValue} width='16' onChange={onChange} />
+      <span>{title}</span>
+      <Input value={storeValue} onChange={onChange} />
     </MenuItemWrapper>
   );
 };

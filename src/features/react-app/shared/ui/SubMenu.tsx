@@ -1,7 +1,7 @@
-import { MenuItemSchema } from '../types';
-import { Dropdown } from './Dropdown';
-import { Menu } from './Menu';
-import { MenuItemWrapper } from './MenuItem';
+import { MenuItemSchema } from './Menu/types';
+import { Dropdown } from './Dropdown/Dropdown';
+import { Menu } from './Menu/Menu';
+import { MenuItemWrapper } from './MenuItemWrapper';
 
 type SubMenuProps = {
   title: string;

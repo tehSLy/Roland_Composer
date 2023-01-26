@@ -1,6 +1,5 @@
-import { Placement } from '../types';
+import { Placement } from './types';
 import tw from 'tailwind-styled-components';
-import { TailwindInterface } from 'tailwind-styled-components/dist/tailwind';
 
 type DropdownProps = {
   anchorComponent?: React.ReactNode;
@@ -27,8 +26,8 @@ export const Dropdown = ({
 const DropdownWrapper = tw.span`
   relative
   [&:hover>*:nth-child(2)]:block
-  [&:hover>span]:bg-slate-500 
-  [&:hover>span]:text-gray-100 
+  [&:hover>li]:bg-slate-500 
+  [&:hover>li]:text-gray-100 
 `;
 
 const DropdownMenuWrapper = tw.div<{ placement: Placement }>`

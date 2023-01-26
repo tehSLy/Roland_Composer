@@ -1,5 +1,5 @@
 import { KeyAction, resolveKeyLabel, resolveShortcut } from '../../../shared';
-import { MenuItemWrapper } from './MenuItem';
+import { MenuItemWrapper } from './MenuItemWrapper';
 
 type ShortcutMenuItem = {
   title: string;

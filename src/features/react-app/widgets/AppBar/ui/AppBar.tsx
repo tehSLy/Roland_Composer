@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { Menu } from '../../../shared/ui/Menu';
+import { Menu } from '../../../shared/ui/Menu/Menu';
 import { createMenuItems } from '../constants';
 import { ProjectName } from '../../../entities/project/ui/ProjectName';
 import { AppModel } from '../../../../AppModel';

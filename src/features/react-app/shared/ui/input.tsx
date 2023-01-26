@@ -5,7 +5,6 @@ type InputProps = {
 };
 
 export const Input = tw.input<InputProps>`
-  ${({ width }) => `w-${width}`}
   rounded-sm
   focus:outline-none
   focus:border-neutral-700

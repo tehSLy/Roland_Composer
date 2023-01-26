@@ -1,14 +1,12 @@
 import { Store } from 'effector';
-import { KeyAction } from '../../shared';
-
-export type Placement = 'rightTop' | 'bottomLeft';
+import { KeyAction } from '../../../../shared';
 
 export type MenuItemSchema = {
   label: string;
   type?: 'button' | 'shortcut' | 'number' | 'submenu' | 'link';
   disabled?: boolean;
   onClick?: () => void;
-  onChange?: (a: any) => void;
+  onChange?: (value: any) => void;
   meta: {
     children?: MenuItemSchema[];
     value?: Store<number>;

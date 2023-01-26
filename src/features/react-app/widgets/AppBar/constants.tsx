@@ -1,5 +1,5 @@
 import { resolveKeyLabel, resolveShortcut } from '../../../shared';
-import { MenuItemSchema } from '../../shared/types';
+import { MenuItemSchema } from '../../shared/ui/Menu/types';
 import { AppModel } from '../../../AppModel';
 
 const filePickerApiAvailable =
@@ -169,6 +169,7 @@ export const createMenuItems = (appModel: AppModel): MenuItemSchema[] => [
       children: [
         {
           label: 'Open manual...',
+          type: 'link',
           meta: {
             href: 'http://cdn.roland.com/assets/media/pdf/TR-808_OM.pdf',
           },

@@ -1,11 +1,11 @@
+import { Button } from '~shared/ui/Button';
+import { Dropdown } from '~shared/ui/Dropdown';
+import { NumericMenuItem } from '~shared/ui/NumericMenuItem';
+import { SubMenu } from '~shared/ui/SubMenu';
+import { ShortcutMenuItem } from '~shared/ui/ShortcutMenuItem';
+import { LinkMenuItem } from '~shared/ui/LinkMenuItem';
+import { MenuItemWrapper } from '~shared/ui/MenuItemWrapper';
 import { MenuItemSchema } from './types';
-import { Button } from '../../shared/ui/Button';
-import { Dropdown } from '../../shared/ui/Dropdown';
-import { NumericMenuItem } from '../../shared/ui/NumericMenuItem';
-import { SubMenu } from '../../shared/ui/SubMenu';
-import { ShortcutMenuItem } from '../../shared/ui/ShortcutMenuItem';
-import { LinkMenuItem } from '../../shared/ui/LinkMenuItem';
-import { MenuItemWrapper } from '../../shared/ui/MenuItemWrapper';
 
 type MenuProps = {
   items?: MenuItemSchema[];

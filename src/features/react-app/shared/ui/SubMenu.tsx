@@ -1,6 +1,6 @@
-import { MenuItemSchema } from '../../features/Menu/types';
-import { Dropdown } from './Dropdown/Dropdown';
-import { Menu } from '../../features/Menu/Menu';
+import { MenuItemSchema } from '~features/Menu/types';
+import { Menu } from '~features/Menu/Menu';
+import { Dropdown } from './Dropdown';
 import { MenuItemWrapper } from './MenuItemWrapper';
 
 type SubMenuProps = {

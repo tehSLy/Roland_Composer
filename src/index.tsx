@@ -1,8 +1,5 @@
 import { createRoot } from 'react-dom/client';
-import { using } from 'forest';
-
-import { App } from './features/react-app/app/app';
-
+import { App } from './features/react-app/app/App';
 import { createAppModel } from './features/AppModel';
 
 const appModel = createAppModel();
@@ -10,8 +7,3 @@ const appModel = createAppModel();
 const root = createRoot(document.getElementById('root') as HTMLElement);
 
 root.render(<App appModel={appModel} />);
-
-// using(document.body, () => {
-//   App({ appModel });
-//   appModel.init();
-// });

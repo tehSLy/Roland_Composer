@@ -23,11 +23,11 @@ export const createIntersectionsManager = (config: {
     createEvent<THREE.Intersection<THREE.Object3D<THREE.Event>>>();
   const activeElement = restore(
     intersected.map((intersection) => intersection.object),
-    null
+    null,
   ).reset(resetIntersected);
 
   const createMutation = <P>(
-    cb: (state: THREE.Object3D[], arg: P) => THREE.Object3D[]
+    cb: (state: THREE.Object3D[], arg: P) => THREE.Object3D[],
   ) => {
     const event = createEvent<P>();
     $intersectable.on(event, cb);

@@ -170,7 +170,7 @@ export const createRoland808Model = (config?: {
     (composition, instrument, ab, part, pattern) => {
       const seq = composition.patterns[pattern][ab]?.[part]?.[instrument];
       return seq || Array.from({ length: 16 }).map((_, k) => 0);
-    }
+    },
   );
 
   const $activePadLights = combine(
@@ -183,7 +183,7 @@ export const createRoland808Model = (config?: {
         copy[note] = copy[note] ? 0 : 1;
       }
       return copy;
-    }
+    },
   );
 
   const cycleABModes = createEvent();
@@ -247,7 +247,7 @@ export const createRoland808Model = (config?: {
             instruments[k].play();
           }
         }
-      }
+      },
     ),
     mapParams: (_, source) => ({ ...source }),
   });
@@ -256,9 +256,9 @@ export const createRoland808Model = (config?: {
     guard($note.updates, { filter: (note) => note === 0 }),
     {
       filter: combine($abMode, $ab, (mode, ab) =>
-        mode === "ab" ? true : mode !== ab
+        mode === "ab" ? true : mode !== ab,
       ),
-    }
+    },
   );
 
   forward({ from: abToggled, to: toggleAB });
@@ -374,14 +374,14 @@ export const createRoland808Model = (config?: {
         clone.patterns[pattern][ab]![part]![instrument][noteAdjusted] = 1;
 
         return clone;
-      }
+      },
     )
     .on(filledIn, (composition, { ab, every, instrument, part, pattern }) => {
       const clone = deepClone(composition);
       clone.patterns[pattern][ab]![part]![instrument].forEach(
         (_, idx) =>
           (clone.patterns[pattern][ab]![part]![instrument][idx] =
-            idx === 0 || idx % every === 0 ? 1 : 0)
+            idx === 0 || idx % every === 0 ? 1 : 0),
       );
       return clone;
     });
@@ -393,7 +393,7 @@ export const createRoland808Model = (config?: {
 
   guard(clearButtonPressed, {
     filter: $currentMode.map(
-      isNotOneOf<PlayerMode>("compose", "play", "manualPlay")
+      isNotOneOf<PlayerMode>("compose", "play", "manualPlay"),
     ),
     target: clearPattern,
   });
@@ -553,7 +553,7 @@ const createInstrumentDataset = () => {
     instrumentsChain.map((instrument) => [
       instrument,
       Array.from({ length: 16 }).map(() => 0),
-    ])
+    ]),
   ) as Record<InstrumentsKeys, number[]>;
 };
 
@@ -576,7 +576,7 @@ const createComposition = <K extends Record<string, any>>(config: {
   const keys = Object.keys(config.instruments);
 
   const dataset = Object.fromEntries(
-    keys.map((key) => [key, createBasicVariation()])
+    keys.map((key) => [key, createBasicVariation()]),
   ) as InstrumentsSetDataset;
 
   if (config.initial) {

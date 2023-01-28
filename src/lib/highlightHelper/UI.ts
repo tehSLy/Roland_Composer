@@ -44,7 +44,7 @@ export function createUI({
   const setCurrentControl = createEvent<string>();
   const $currentControl = restore(
     setCurrentControl,
-    $controlsNames.getState()[0]
+    $controlsNames.getState()[0],
   );
   const $availableControls = combine(
     $controlsNames,
@@ -58,7 +58,7 @@ export function createUI({
       }
 
       return result;
-    }
+    },
   );
 
   const fxSave = attach({
@@ -126,7 +126,7 @@ export function createUI({
   const elementClicked = sample(
     $cachedObject,
     itemSelected,
-    (prev, current) => ({ current, prev })
+    (prev, current) => ({ current, prev }),
   );
 
   guard(elementClicked, {
@@ -176,7 +176,7 @@ const ControlsSelect = ({
         h("option", {
           text: remap(store, "value"),
         });
-      }
+      },
     );
   });
 };
@@ -191,7 +191,7 @@ const AssignedControls = ({
   const parsedControls = controls.map((record) =>
     Object.entries(record)
       .map(([k, v]) => ({ key: k, value: v }))
-      .filter(({ value }) => !!value)
+      .filter(({ value }) => !!value),
   );
 
   h("div", () => {

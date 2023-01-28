@@ -175,7 +175,7 @@ export const bindPlayerToControls = ({
   });
 
   controlsModel.model.padControls.padsHandlers.map((handler, k) =>
-    clickManager.register(controls.pads[k], handler)
+    clickManager.register(controls.pads[k], handler),
   );
 
   clickManager.register(controls.startStopButton, player.togglePlay);
@@ -194,7 +194,7 @@ export const bindPlayerToControls = ({
       controls.padsLights[k].material = isActive
         ? activeLightMaterial
         : lightsMaterialCache[k];
-    })
+    }),
   );
 
   player._meta.$ab.watch((ab) => {

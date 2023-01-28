@@ -21,7 +21,7 @@ export const createScene = () => {
     45,
     window.innerWidth / window.innerHeight,
     0.1,
-    500
+    500,
   );
   renderer.outputEncoding = THREE.sRGBEncoding;
   const controls = new OrbitControls(camera, renderer.domElement);
@@ -43,7 +43,7 @@ export const createScene = () => {
   const ticker = createAnimationFrameTicker();
 
   const fxBindElement = createEffect((el: HTMLElement) =>
-    el.appendChild(renderer.domElement)
+    el.appendChild(renderer.domElement),
   );
 
   const fxSceneAdd = createEffect(scene.add.bind(scene));

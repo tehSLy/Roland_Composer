@@ -34,7 +34,7 @@ export const MenuDropdown = ({
         },
         visible: combine(
           { isOpen: $isOpen, disabled: disabled || false },
-          ({ disabled, isOpen }) => (disabled ? false : isOpen)
+          ({ disabled, isOpen }) => (disabled ? false : isOpen),
         ),
         style: {
           width: "max-content",

@@ -15,7 +15,7 @@ export const basicTextStyle = (config?: {
       class: combine(
         $class,
         $textStyle,
-        (additionalClass, textStyle) => `${additionalClass} ${textStyle}`
+        (additionalClass, textStyle) => `${additionalClass} ${textStyle}`,
       ),
     },
   });

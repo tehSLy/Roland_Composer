@@ -1,134 +1,134 @@
-import { AppModel } from '~/features/AppModel';
-import { MenuItemSchema } from '~features/Menu/types';
+import { AppModel } from "~/features/AppModel";
+import { MenuItemSchema } from "~features/Menu/types";
 
 const filePickerApiAvailable =
-  'showSaveFilePicker' in window && 'showOpenFilePicker' in window;
+  "showSaveFilePicker" in window && "showOpenFilePicker" in window;
 
 export const createMenuItems = (appModel: AppModel): MenuItemSchema[] => [
   {
-    label: 'Menu',
-    type: 'button',
+    label: "Menu",
+    type: "button",
     meta: {
-      href: '',
+      href: "",
       children: [
         {
-          label: 'Save...',
+          label: "Save...",
           onClick: appModel.uiModel.saveModal.open,
           meta: {
-            href: '',
+            href: "",
           },
         },
         {
-          label: 'Load...',
+          label: "Load...",
           onClick: appModel.uiModel.loadModal.open,
           meta: {
-            href: '',
+            href: "",
           },
         },
         {
-          label: 'Import...',
+          label: "Import...",
           onClick: appModel.import,
           disabled: !filePickerApiAvailable,
           meta: {
-            href: '',
+            href: "",
           },
         },
         {
-          label: 'Export...',
+          label: "Export...",
           onClick: appModel.export,
           disabled: !filePickerApiAvailable,
           meta: {
-            href: '',
+            href: "",
           },
         },
         {
-          label: 'Render...',
+          label: "Render...",
           disabled: true,
           meta: {
-            href: '',
+            href: "",
           },
         },
         {
-          label: 'Share...',
+          label: "Share...",
           onClick: appModel.share,
           meta: {
-            href: '',
+            href: "",
           },
         },
       ],
     },
   },
   {
-    label: 'Composer',
-    type: 'button',
+    label: "Composer",
+    type: "button",
     meta: {
-      href: '',
+      href: "",
       children: [
         {
-          label: 'Set BPM',
-          type: 'number',
+          label: "Set BPM",
+          type: "number",
           onChange: appModel.deviceModel._bpm.setPosition,
           meta: {
-            href: '',
+            href: "",
             value: appModel.deviceModel._bpm.position,
           },
         },
         {
-          label: 'Start/Stop',
-          type: 'shortcut',
+          label: "Start/Stop",
+          type: "shortcut",
           onClick: appModel.deviceModel.togglePlay,
           meta: {
-            href: '',
-            shortcut: 'startStop',
+            href: "",
+            shortcut: "startStop",
           },
         },
         {
-          label: 'Cycle A/B',
-          type: 'shortcut',
+          label: "Cycle A/B",
+          type: "shortcut",
           onClick: appModel.deviceModel.cycleABModes,
           meta: {
-            href: '',
-            shortcut: 'cycleAb',
+            href: "",
+            shortcut: "cycleAb",
           },
         },
         {
-          label: 'Clear Pattern',
+          label: "Clear Pattern",
           onClick: appModel.deviceModel.clearPattern,
           meta: {
-            href: '',
+            href: "",
           },
         },
         {
-          label: 'Fill in...',
-          type: 'submenu',
+          label: "Fill in...",
+          type: "submenu",
           meta: {
-            href: '',
+            href: "",
             children: [
               {
-                label: 'Every 2th',
+                label: "Every 2th",
                 onClick: appModel.deviceModel.fillInEvery.prepend(
-                  (_: void) => 2
+                  (_: void) => 2,
                 ),
                 meta: {
-                  href: '',
+                  href: "",
                 },
               },
               {
-                label: 'Every 4th',
+                label: "Every 4th",
                 onClick: appModel.deviceModel.fillInEvery.prepend(
-                  (_: void) => 4
+                  (_: void) => 4,
                 ),
                 meta: {
-                  href: '',
+                  href: "",
                 },
               },
               {
-                label: 'Every 8th',
+                label: "Every 8th",
                 onClick: appModel.deviceModel.fillInEvery.prepend(
-                  (_: void) => 8
+                  (_: void) => 8,
                 ),
                 meta: {
-                  href: '',
+                  href: "",
                 },
               },
             ],
@@ -138,46 +138,46 @@ export const createMenuItems = (appModel: AppModel): MenuItemSchema[] => [
     },
   },
   {
-    label: 'View',
-    type: 'button',
+    label: "View",
+    type: "button",
     meta: {
-      href: '',
+      href: "",
       children: [
         {
-          label: 'Toggle Keybindings',
+          label: "Toggle Keybindings",
           onClick: appModel.uiModel.toggleKeybindingsVisible,
           meta: {
-            href: '',
+            href: "",
           },
         },
         {
-          label: 'Toggle History',
+          label: "Toggle History",
           onClick: appModel.uiModel.toggleHistoryVisible,
           meta: {
-            href: '',
+            href: "",
           },
         },
       ],
     },
   },
   {
-    label: 'Help',
-    type: 'button',
+    label: "Help",
+    type: "button",
     meta: {
-      href: '',
+      href: "",
       children: [
         {
-          label: 'Open manual...',
-          type: 'link',
+          label: "Open manual...",
+          type: "link",
           meta: {
-            href: 'http://cdn.roland.com/assets/media/pdf/TR-808_OM.pdf',
+            href: "http://cdn.roland.com/assets/media/pdf/TR-808_OM.pdf",
           },
         },
         {
-          label: 'About...',
+          label: "About...",
           onClick: appModel.uiModel.aboutModal.open,
           meta: {
-            href: '',
+            href: "",
           },
         },
       ],

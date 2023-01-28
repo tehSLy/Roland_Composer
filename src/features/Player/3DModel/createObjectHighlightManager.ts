@@ -4,7 +4,7 @@ import {
   createStore,
   guard,
   sample,
-  Store
+  Store,
 } from "effector";
 import { Material, Mesh } from "three";
 import { DragManager } from "./createDragManager";
@@ -27,7 +27,7 @@ export const createObjectHighlightManager = ({
     overrideElement,
     (active, override) => {
       return (override || active) as Mesh;
-    }
+    },
   );
 
   let cachedObject: Mesh | null = null;

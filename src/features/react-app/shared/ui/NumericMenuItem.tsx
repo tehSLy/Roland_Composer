@@ -1,7 +1,7 @@
-import { Store } from 'effector';
-import { useStore } from 'effector-react';
-import { Input } from './Input';
-import { MenuItemWrapper } from './MenuItemWrapper';
+import { Store } from "effector";
+import { useStore } from "effector-react";
+import { Input } from "./Input";
+import { MenuItemWrapper } from "./MenuItemWrapper";
 
 type NumericMenuItemProps = {
   title: string;

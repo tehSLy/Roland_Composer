@@ -3,7 +3,7 @@ import { StoreOrData } from "forest";
 
 export const storeOrDataToStore = <T>(
   storeOrData: StoreOrData<T> | undefined,
-  defaultValue: T
+  defaultValue: T,
 ) => {
   return is.store(storeOrData)
     ? (storeOrData as Store<T>)

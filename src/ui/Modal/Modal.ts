@@ -22,7 +22,7 @@ export function Modal(config: {
   const { close, isOpen: $open } = config.model;
   const closeOnClickOutside = storeOrDataToStore(
     config.closeOnClickOutside,
-    true
+    true,
   );
   const clicked = createEvent<MouseEvent>();
   const modalContent =
@@ -94,7 +94,7 @@ export function Modal(config: {
                         text: button.label,
                         handler: {
                           click: button.handler.prepend(
-                            () => null
+                            () => null,
                           ) as Event<any>,
                         },
                       });
@@ -114,7 +114,7 @@ function ModalBackdrop(config?: { visible?: StoreOrData<boolean> }) {
   h("div", {
     attr: {
       class: "fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity",
-      hidden: storeOrDataToStore(config?.visible, false).map((v) => !v) // for some reason visible prop doesn't work
+      hidden: storeOrDataToStore(config?.visible, false).map((v) => !v), // for some reason visible prop doesn't work
     },
     visible: storeOrDataToStore(config?.visible, false),
   });

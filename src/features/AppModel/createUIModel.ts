@@ -5,13 +5,13 @@ export const createUIModel = () => {
   const toggleKeybindingsVisible = createEvent();
   const $keybindingsVisible = createStore(false).on(
     toggleKeybindingsVisible,
-    (is) => !is
+    (is) => !is,
   );
 
   const toggleHistoryVisible = createEvent();
   const $historyVisible = createStore(false).on(
     toggleHistoryVisible,
-    (is) => !is
+    (is) => !is,
   );
 
   const aboutModal = createModalModel({});
@@ -20,7 +20,7 @@ export const createUIModel = () => {
 
   const $isModalOpened = combine(
     [aboutModal.isOpen, saveModal.isOpen, loadModal.isOpen],
-    (params) => params.some(Boolean)
+    (params) => params.some(Boolean),
   );
 
   return {

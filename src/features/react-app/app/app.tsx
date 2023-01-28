@@ -1,8 +1,8 @@
-import { useStore } from 'effector-react';
-import { useEffect, useRef } from 'react';
-import { AppBar } from '~widgets/AppBar';
-import { AppModel } from '~/features/AppModel';
-import { LoadingIndicator } from '~shared/ui/LoadingIndicator';
+import { useStore } from "effector-react";
+import { useEffect, useRef } from "react";
+import { AppBar } from "~widgets/AppBar";
+import { AppModel } from "~/features/AppModel";
+import { LoadingIndicator } from "~shared/ui/LoadingIndicator";
 
 type AppProps = {
   appModel: AppModel;

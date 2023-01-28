@@ -22,7 +22,7 @@ export const createClickManager = ({ intersectionsManager }: Config) => {
         }
 
         return handler(params.event);
-      }
+      },
     ),
     mapParams: (event: MouseEvent, activeElement) => ({ event, activeElement }),
   });

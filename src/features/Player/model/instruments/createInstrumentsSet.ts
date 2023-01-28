@@ -12,7 +12,7 @@ import {
   lowTomMap,
   midTomMap,
   rimshotMap,
-  snareDrumUrlMap
+  snareDrumUrlMap,
 } from "./urlMaps";
 
 export const createInstrumentsSet = () => {
@@ -76,9 +76,7 @@ export const createInstrumentsSet = () => {
       urlMap: snareDrumUrlMap,
       additionalKnobsCount: 2,
     }),
-    accent: {
-      
-    },
+    accent: {},
   };
 
   const fxPollLoading = createEffect(() => {

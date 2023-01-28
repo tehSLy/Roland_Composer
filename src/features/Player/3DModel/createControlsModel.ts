@@ -38,7 +38,7 @@ export const createControlsModel = () => {
       return object.rotation.set(
         0,
         angle === undefined ? instrumentMap.bassDrum : angle,
-        0
+        0,
       );
     },
     model: (fx) => ({
@@ -64,7 +64,7 @@ export const createControlsModel = () => {
       return object.rotation.set(
         0,
         angle === undefined ? playerModesMap.firstPart : angle,
-        0
+        0,
       );
     },
     model: (fx) => ({ setMode: fx }),
@@ -181,7 +181,7 @@ export type ControlsModel = ReturnType<typeof createControlsModel>;
 const createBindableModelFactory = <
   R,
   P,
-  T extends THREE.Object3D | THREE.Object3D[] = THREE.Object3D
+  T extends THREE.Object3D | THREE.Object3D[] = THREE.Object3D,
 >(config: {
   model(handler: Effect<P, any, Error>): R;
   handler(obj: T, params: P): void;
@@ -208,7 +208,7 @@ const resolveMap = <T extends string | number>({
   inverseAngle?: boolean;
 }) =>
   Object.fromEntries(
-    dictionary.map((v, k) => [v, start - step * k * (inverseAngle ? -1 : 1)])
+    dictionary.map((v, k) => [v, start - step * k * (inverseAngle ? -1 : 1)]),
   ) as Record<T, number>;
 
 const resolveAngleStep = (params: {
@@ -276,7 +276,7 @@ export type TumblerModel = ReturnType<typeof createTumblerModel>;
 export const createPadControlsModel = () => {
   const padClicked = createEvent<number>();
   const padsHandlers = Array.from({ length: 16 }).map((_, k) =>
-    padClicked.prepend(() => k)
+    padClicked.prepend(() => k),
   );
 
   return {
@@ -297,13 +297,13 @@ export const createKnobsRowModel = <C extends 1 | 2 | 3>(config: {
   const models = [
     volumeKnobModel,
     ...Array.from({ length: config.additionalKnobsCount }).map((_, k) =>
-      createKnobModel({ offset: config.offset[k + 1], steps: 5 })
+      createKnobModel({ offset: config.offset[k + 1], steps: 5 }),
     ),
   ];
 
   return {
     bind: <T extends THREE.Object3D[] | readonly THREE.Object3D[]>(
-      objects: T
+      objects: T,
     ) => models.forEach((model, k) => model.bind(objects[k])),
     models: models.map(({ model }) => model),
   };

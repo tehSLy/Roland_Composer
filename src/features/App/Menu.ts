@@ -76,19 +76,19 @@ export const Menu = ({ appModel }: { appModel: AppModel }) => {
                 {
                   label: "Every 2th",
                   handler: appModel.deviceModel.fillInEvery.prepend(
-                    (_: void) => 2
+                    (_: void) => 2,
                   ),
                 },
                 {
                   label: "Every 4th",
                   handler: appModel.deviceModel.fillInEvery.prepend(
-                    (_: void) => 4
+                    (_: void) => 4,
                   ),
                 },
                 {
                   label: "Every 8th",
                   handler: appModel.deviceModel.fillInEvery.prepend(
-                    (_: void) => 8
+                    (_: void) => 8,
                   ),
                 },
               ],

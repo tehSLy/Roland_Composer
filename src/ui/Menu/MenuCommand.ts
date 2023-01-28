@@ -40,11 +40,11 @@ export const MenuCommand = ({
           "px-5 py-1 flex justify-between gap-x-4 relative w-full disabled:cursor-default",
           {
             "hover:text-gray-100 hover:bg-slate-500": !disabled,
-          }
-        )
+          },
+        ),
       ),
       textColor: $isDisabled.map((is) =>
-        is ? ("text-neutral-400" as string) : null
+        is ? ("text-neutral-400" as string) : null,
       ),
     });
 
@@ -114,7 +114,7 @@ export const MenuCommand = ({
             filter: (value) =>
               validateNumber({ value, from: meta.from, to: meta.to }),
             target: meta.handler,
-          }
+          },
         );
       }
 

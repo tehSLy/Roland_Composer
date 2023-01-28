@@ -1,11 +1,11 @@
-import { Button } from '~shared/ui/Button';
-import { Dropdown } from '~shared/ui/Dropdown';
-import { NumericMenuItem } from '~shared/ui/NumericMenuItem';
-import { SubMenu } from '~shared/ui/SubMenu';
-import { ShortcutMenuItem } from '~shared/ui/ShortcutMenuItem';
-import { LinkMenuItem } from '~shared/ui/LinkMenuItem';
-import { MenuItemWrapper } from '~shared/ui/MenuItemWrapper';
-import { MenuItemSchema } from './types';
+import { Button } from "~shared/ui/Button";
+import { Dropdown } from "~shared/ui/Dropdown";
+import { NumericMenuItem } from "~shared/ui/NumericMenuItem";
+import { SubMenu } from "~shared/ui/SubMenu";
+import { ShortcutMenuItem } from "~shared/ui/ShortcutMenuItem";
+import { LinkMenuItem } from "~shared/ui/LinkMenuItem";
+import { MenuItemWrapper } from "~shared/ui/MenuItemWrapper";
+import { MenuItemSchema } from "./types";
 
 type MenuProps = {
   items?: MenuItemSchema[];
@@ -21,7 +21,7 @@ export const Menu = ({ items }: MenuProps) => {
         const { children, value, shortcut, href } = meta;
 
         switch (type) {
-          case 'button': {
+          case "button": {
             return (
               <Dropdown
                 anchorComponent={<Button disabled={disabled}>{label}</Button>}
@@ -32,11 +32,11 @@ export const Menu = ({ items }: MenuProps) => {
             );
           }
 
-          case 'submenu': {
+          case "submenu": {
             return <SubMenu title={label} items={children} />;
           }
 
-          case 'number': {
+          case "number": {
             return (
               <NumericMenuItem
                 title={label}
@@ -46,11 +46,11 @@ export const Menu = ({ items }: MenuProps) => {
             );
           }
 
-          case 'shortcut': {
+          case "shortcut": {
             return <ShortcutMenuItem title={label} shortcut={shortcut} />;
           }
 
-          case 'link': {
+          case "link": {
             return <LinkMenuItem title={label} href={href} />;
           }
 

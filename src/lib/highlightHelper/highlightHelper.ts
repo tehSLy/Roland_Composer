@@ -61,9 +61,9 @@ export const createHighlightHelper = ({ camera }) => {
     (cache, assigned) => {
       const assignedNames = Object.values(assigned);
       const filtered = cache.filter((el) => !assignedNames.includes(el.name));
-      
+
       return filtered;
-    }
+    },
   );
 
   forward({ from: $availableElements, to: setIntersectable });

@@ -1,2 +1,1 @@
-export { storeOrDataToStore } from './storeOrDataToStore';
-
+export { storeOrDataToStore } from "./storeOrDataToStore";

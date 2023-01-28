@@ -1,5 +1,5 @@
-import { Placement } from './types';
-import tw from 'tailwind-styled-components';
+import { Placement } from "./types";
+import tw from "tailwind-styled-components";
 
 type DropdownProps = {
   anchorComponent?: React.ReactNode;
@@ -9,7 +9,7 @@ type DropdownProps = {
 
 export const Dropdown = ({
   anchorComponent,
-  placement = 'bottomLeft',
+  placement = "bottomLeft",
 
   children,
 }: DropdownProps) => {
@@ -40,6 +40,6 @@ const DropdownMenuWrapper = tw.div<{ placement: Placement }>`
 `;
 
 const placementMap: Record<Placement, string> = {
-  rightTop: '-top-1 left-full',
-  bottomLeft: 'left-0',
+  rightTop: "-top-1 left-full",
+  bottomLeft: "left-0",
 };

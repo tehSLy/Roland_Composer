@@ -27,11 +27,11 @@ const createInstrumentBaseModel = ({
 }) => {
   const $prefix = createStore(prefixInitial);
   const $isMainInstrumentToggled = $prefix.map(
-    (prefix) => prefix === prefixInitial
+    (prefix) => prefix === prefixInitial,
   );
   const $volume = createStore(50);
   const $knobs = createStore(
-    Array.from({ length: knobsCount }).map((_, k) => knobsInitial?.[k] || 2)
+    Array.from({ length: knobsCount }).map((_, k) => knobsInitial?.[k] || 2),
   );
   const $currentNote = combine($prefix, $knobs, (prefix, knobs) => {
     return prefix + knobs.map((k) => KNOB_POSITIONS[k]).join("");
@@ -94,12 +94,12 @@ export const createInstrument = ({
   $prefix
     .on(setPrefix, (_, next) => next)
     .on(togglePrefix, (prefix) =>
-      prefix === prefixInitial ? alterPrefix : prefixInitial
+      prefix === prefixInitial ? alterPrefix : prefixInitial,
     );
 
   $knobs
     .on(setKnob, (knobs, { id, level }) =>
-      knobs.map((currentLevel, idx) => (idx === id ? level : currentLevel))
+      knobs.map((currentLevel, idx) => (idx === id ? level : currentLevel)),
     )
     .on(setKnobs, (_, knobs) => knobs);
 

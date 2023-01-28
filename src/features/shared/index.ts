@@ -1,3 +1,2 @@
-export * from './keymapping';
+export * from "./keymapping";
 export { clearColor } from "./palette";
-

@@ -25,10 +25,9 @@ export function SelectableList<T>({
     attr: {
       class:
         "mb-1 rounded-sm focus:outline-none focus:border-neutral-700 focus:ring-neutral-700 focus:ring-2 text-gray-200 bg-neutral-500 px-1 w-full",
-
     },
     handler: {
-        input: model.setInputValue.prepend((e) => e.target.value)
+      input: model.setInputValue.prepend((e) => e.target.value),
     },
     fn() {
       node((el) => {

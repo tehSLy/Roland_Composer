@@ -33,6 +33,6 @@ export const $controlsNames = createStore([
 
 function createArrayOfControls(params: { length: number; name: string }) {
   return Array.from({ length: params.length }).map(
-    (_, k) => `${params.name}.${k}`
+    (_, k) => `${params.name}.${k}`,
   );
 }

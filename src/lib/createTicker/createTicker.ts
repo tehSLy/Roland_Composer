@@ -44,7 +44,7 @@ export const createTicker = ({ delay = 100 }: Config) => {
   const fxTick = attach({
     source: $delay,
     effect: createEffect(
-      (delay: number) => new Promise((rs) => setTimeout(rs, delay))
+      (delay: number) => new Promise((rs) => setTimeout(rs, delay)),
     ),
   });
 
@@ -69,7 +69,7 @@ export const createAnimationFrameTicker = () => {
   const { $isRunning, start, stop, tick, toggle } = createInterface();
 
   $isRunning.watch(tick, (is) =>
-    is ? requestAnimationFrame(tick as any) : null
+    is ? requestAnimationFrame(tick as any) : null,
   );
 
   forward({ from: start, to: tick });
@@ -116,7 +116,7 @@ export const createAdjustableTicker = ({
   // restart ticker upon mode change
   forward({ from: $mode, to: [stop, start] });
 
-  forward({from: stop, to: [delayTicker.stop, rafTicker.stop]});
+  forward({ from: stop, to: [delayTicker.stop, rafTicker.stop] });
 
   return {
     isRunning: $isRunning,

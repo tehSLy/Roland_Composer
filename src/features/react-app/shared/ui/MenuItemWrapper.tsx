@@ -1,4 +1,4 @@
-import tw from 'tailwind-styled-components';
+import tw from "tailwind-styled-components";
 
 type MenuItemWrapperProps = {
   disabled?: boolean;
@@ -24,5 +24,5 @@ export const MenuItemWrapper = tw.li<MenuItemWrapperProps>`
   text-gray-300
   ${({ disabled }) =>
     disabled &&
-    'text-neutral-400 hover:bg-inherit hover:text-neutral-400 cursor-default'}
+    "text-neutral-400 hover:bg-inherit hover:text-neutral-400 cursor-default"}
   `;

@@ -37,6 +37,7 @@
     "foliage": "^0.201.0",
     "forest": "^0.20.3",
     "parcel-resolver-tspaths": "^0.0.9",
+    "prettier": "2.8.3",
     "postcss": "^8.4.12",
     "process": "^0.11.10",
     "sass": "^1.49.7",
@@ -48,7 +49,8 @@
     "start": "parcel index.html",
     "build": "parcel build index.html --public-url .",
     "predeploy": "npm run build",
-    "deploy": "npx gh-pages -d dist"
+    "deploy": "npx gh-pages -d dist",
+    "pretty": "prettier --write \"./**/*.{js,jsx,ts,tsx,json}\""
   },
   "alias": {
     "~/*": "./src/*",

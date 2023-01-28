@@ -58,7 +58,7 @@ export const createKeyPressManager = ({
     Array.from({ length: 16 }).map((_, v) => [
       `pad${v + 1}`,
       padPressed.prepend(() => v),
-    ])
+    ]),
   );
 
   const increasePressed = createEvent();
@@ -85,10 +85,10 @@ export const createKeyPressManager = ({
       togglePad: player.toggleActiveInstrumentPad,
       mute: player.mute.prepend((k) => instrumentsChain[k]),
       instrument: player._instrument.setPosition.prepend(
-        (k) => instrumentsChain[k]
+        (k) => instrumentsChain[k],
       ),
       mode: player._mode.setPosition.prepend((k) =>
-        k in playerModes ? playerModes[k] : playerModes[1]
+        k in playerModes ? playerModes[k] : playerModes[1],
       ),
     },
   });

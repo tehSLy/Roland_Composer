@@ -1,5 +1,5 @@
 const padsMapping = Object.fromEntries(
-  Array.from({ length: 9 }).map((_, v) => [`Digit${v + 1}`, `pad${v + 1}`])
+  Array.from({ length: 9 }).map((_, v) => [`Digit${v + 1}`, `pad${v + 1}`]),
 );
 
 export type KeyAction =
@@ -126,5 +126,5 @@ export const resolveShortcut = (action: KeyAction) => {
 export const resolveKeymapping = () => keymapping;
 const reverseMap = Object.entries(keymapping).reduce(
   (carry, [shortcut, action]) => ((carry[action] = shortcut), carry),
-  {} as Record<KeyAction, string>
+  {} as Record<KeyAction, string>,
 );

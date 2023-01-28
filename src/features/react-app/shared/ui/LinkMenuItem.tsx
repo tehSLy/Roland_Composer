@@ -1,4 +1,4 @@
-import { MenuItemWrapper } from './MenuItemWrapper';
+import { MenuItemWrapper } from "./MenuItemWrapper";
 
 type LinkMenuItemProps = {
   title: string;
@@ -8,7 +8,7 @@ type LinkMenuItemProps = {
 export const LinkMenuItem = ({ title, href }: LinkMenuItemProps) => {
   return (
     <li>
-      <MenuItemWrapper $as={'a'} href={href}>
+      <MenuItemWrapper $as={"a"} href={href}>
         {title}
       </MenuItemWrapper>
     </li>

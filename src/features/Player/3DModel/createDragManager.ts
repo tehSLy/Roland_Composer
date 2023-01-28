@@ -50,7 +50,7 @@ export const createDragManager = ({
       }) => {
         const handlers = dragHandlersMap.get(params.activeElement);
         return handlers ? { ...handlers, event: params.event } : null;
-      }
+      },
     ),
     mapParams: (event: MouseEvent, activeElement) => ({ event, activeElement }),
   });
@@ -78,7 +78,7 @@ export const createDragManager = ({
         activeElementCache = params.activeElement;
 
         currentDragHandlerCache = handlers.onDrag;
-      }
+      },
     ),
     mapParams: (data: { event: MouseEvent }, activeElement) => ({
       ...data,
@@ -97,7 +97,7 @@ export const createDragManager = ({
   $isDragging.watch((is) => {
     document[is ? "addEventListener" : "removeEventListener"](
       "mousemove",
-      onDragDebounced
+      onDragDebounced,
     );
   });
 
@@ -107,7 +107,7 @@ export const createDragManager = ({
   });
 
   const removeEventListeners = createEffect(() =>
-    document.removeEventListener("mouseup", onDragEnd)
+    document.removeEventListener("mouseup", onDragEnd),
   );
 
   const register = createEffect(
@@ -116,13 +116,13 @@ export const createDragManager = ({
       handlers: DragHandlers;
     }) => {
       dragHandlersMap.set(params.object, params.handlers);
-    }
+    },
   );
 
   const registerSteppedDragControl = <
     C extends number,
     D extends T[] | Readonly<T[]>,
-    T
+    T,
   >(config: {
     resolveCache: () => C;
     dictionary: D;
@@ -184,7 +184,7 @@ export const createDragManager = ({
           const clamped = clamp(
             config.range[0],
             config.range[1],
-            base - newValue
+            base - newValue,
           );
           config.handler(clamped as C);
         },
@@ -212,6 +212,6 @@ export const disableCameraControlsUponDrag = (config: {
   cameraControls: any;
 }) => {
   config.dragManager.isDragging.watch(
-    (is) => (config.cameraControls.enabled = !is)
+    (is) => (config.cameraControls.enabled = !is),
   );
 };

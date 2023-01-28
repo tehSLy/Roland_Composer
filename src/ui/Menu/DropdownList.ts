@@ -24,7 +24,7 @@ export const StaticDropdownList = ({
           {
             bottom: "top-full left-0",
             right: "left-full -top-1",
-          }[side]
+          }[side],
         ),
       },
       visible: is.store(visible) ? visible : createStore(visible as boolean),

@@ -13,13 +13,13 @@ export function SaveModal({ appModel: appModel }: { appModel: AppModel }) {
           ({
             createdAt: "",
             name: key,
-          } as Project)
-      )
+          } as Project),
+      ),
     ),
   });
 
   appModel.uiModel.saveModal.isOpen.watch((is) =>
-    is ? setTimeout(listModel.focus, 50) : null
+    is ? setTimeout(listModel.focus, 50) : null,
   );
 
   sample({

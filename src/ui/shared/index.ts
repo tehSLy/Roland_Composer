@@ -1,2 +1,1 @@
-export { basicTextStyleClass } from './styles';
-
+export { basicTextStyleClass } from "./styles";

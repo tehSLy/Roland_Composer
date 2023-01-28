@@ -1,4 +1,4 @@
-import tw from 'tailwind-styled-components';
+import tw from "tailwind-styled-components";
 
 type LoadingIndicatorProps = {
   isVisible: boolean;
@@ -9,7 +9,7 @@ export const LoadingIndicator = ({ isVisible }: LoadingIndicatorProps) => {
 
   return (
     <Wrapper>
-      <Spinner role='status' />
+      <Spinner role="status" />
     </Wrapper>
   );
 };

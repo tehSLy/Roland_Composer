@@ -1,1 +1,1 @@
-export { createAnimationFrameTicker, createTicker } from './createTicker';
+export { createAnimationFrameTicker, createTicker } from "./createTicker";

@@ -4,9 +4,9 @@ import { spec } from "forest";
 export const hover = <
   T extends
     | EffectorEvent<{ hovered: boolean; event: Event }>
-    | Effect<{ hovered: boolean; event: Event }, any, any>
+    | Effect<{ hovered: boolean; event: Event }, any, any>,
 >(
-  handler?: T
+  handler?: T,
 ) => {
   const onHover = createEvent<{ hovered: boolean; event: Event }>();
   spec({

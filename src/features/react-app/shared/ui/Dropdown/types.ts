@@ -1,1 +1,1 @@
-export type Placement = 'rightTop' | 'bottomLeft';
+export type Placement = "rightTop" | "bottomLeft";

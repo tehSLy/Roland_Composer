@@ -51,7 +51,7 @@ export const History = <A extends Event<HistoryAction>[]>({
             });
             const $type = remap(store, "type");
             const $dotClass = $type.map(
-              composeResolveDotClass("rounded-full p-1 mx-2")
+              composeResolveDotClass("rounded-full p-1 mx-2"),
             );
             const $typeLabel = $type.map(resolveTypeLabel);
             const $value = store.map(({ type, value }) => {

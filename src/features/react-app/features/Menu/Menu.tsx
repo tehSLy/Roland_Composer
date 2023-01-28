@@ -1,11 +1,12 @@
 import { MenuItemSchema } from './types';
-import { Button } from '../Button';
-import { Dropdown } from '../Dropdown/Dropdown';
-import { NumericMenuItem } from '../NumericMenuItem';
-import { SubMenu } from '../SubMenu';
-import { ShortcutMenuItem } from '../ShortcutMenuItem';
-import { LinkMenuItem } from '../LinkMenuItem';
-import { MenuItemWrapper } from '../MenuItemWrapper';
+import { Button } from '../../shared/ui/Button';
+import { Dropdown } from '../../shared/ui/Dropdown';
+import { NumericMenuItem } from '../../shared/ui/NumericMenuItem';
+import { SubMenu } from '../../shared/ui/SubMenu';
+import { ShortcutMenuItem } from '../../shared/ui/ShortcutMenuItem';
+import { LinkMenuItem } from '../../shared/ui/LinkMenuItem';
+import { MenuItemWrapper } from '../../shared/ui/MenuItemWrapper';
+import { useStore } from 'effector-react';
 
 type MenuProps = {
   items?: MenuItemSchema[];
@@ -16,7 +17,7 @@ export const Menu = ({ items }: MenuProps) => {
 
   return (
     <ul>
-      {items.map(item => {
+      {items.map((item) => {
         const { label, type, disabled, onChange = () => null, meta } = item;
         const { children, value, shortcut, href } = meta;
 
@@ -25,7 +26,7 @@ export const Menu = ({ items }: MenuProps) => {
             return (
               <Dropdown
                 anchorComponent={<Button disabled={disabled}>{label}</Button>}
-                placement='bottomLeft'
+                placement="bottomLeft"
               >
                 <Menu items={children} />
               </Dropdown>
@@ -37,11 +38,13 @@ export const Menu = ({ items }: MenuProps) => {
           }
 
           case 'number': {
+            const storeValue = useStore(value!);
+
             return (
               <NumericMenuItem
                 title={label}
-                value={value}
-                onChange={event => onChange(event.currentTarget.value)}
+                value={storeValue}
+                onChange={(event) => onChange(event.currentTarget.value)}
               />
             );
           }

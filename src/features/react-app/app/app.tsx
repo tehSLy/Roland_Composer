@@ -1,6 +1,6 @@
 import { useStore } from 'effector-react';
 import { useEffect, useRef } from 'react';
-import { AppBar } from '../widgets/AppBar/ui/AppBar';
+import { AppBar } from '../widgets/AppBar';
 import { LoadingIndicator } from '../shared/ui/LoadingIndicator';
 import { AppModel } from '../../AppModel/createAppModel';
 

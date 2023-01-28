@@ -1,6 +1,6 @@
-import { MenuItemSchema } from './Menu/types';
+import { MenuItemSchema } from '../../features/Menu/types';
 import { Dropdown } from './Dropdown/Dropdown';
-import { Menu } from './Menu/Menu';
+import { Menu } from '../../features/Menu/Menu';
 import { MenuItemWrapper } from './MenuItemWrapper';
 
 type SubMenuProps = {
@@ -16,7 +16,7 @@ export const SubMenu = ({ title, items }: SubMenuProps) => {
           {title} <span>▸</span>
         </MenuItemWrapper>
       }
-      placement='rightTop'
+      placement="rightTop"
     >
       <Menu items={items} />
     </Dropdown>

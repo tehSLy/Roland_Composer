@@ -1,5 +1,4 @@
-import { resolveKeyLabel, resolveShortcut } from '../../../shared';
-import { MenuItemSchema } from '../../shared/ui/Menu/types';
+import { MenuItemSchema } from '../../features/Menu/types';
 import { AppModel } from '../../../AppModel';
 
 const filePickerApiAvailable =

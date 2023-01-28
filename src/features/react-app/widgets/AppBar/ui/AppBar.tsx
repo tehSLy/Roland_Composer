@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { Menu } from '../../../shared/ui/Menu/Menu';
+import { Menu } from '../../../features/Menu';
 import { createMenuItems } from '../constants';
 import { ProjectName } from '../../../entities/project/ui/ProjectName';
 import { AppModel } from '../../../../AppModel';
@@ -14,10 +14,10 @@ export const AppBar = ({ appModel }: AppBarProps) => {
 
   return (
     <AppBarWrapper>
-      <div className='flex items-center'>
+      <div className="flex items-center">
         <Menu items={menuItems} />
       </div>
-      <div className='flex justify-center items-center'>
+      <div className="flex justify-center items-center">
         <ProjectName appModel={appModel} />
       </div>
     </AppBarWrapper>

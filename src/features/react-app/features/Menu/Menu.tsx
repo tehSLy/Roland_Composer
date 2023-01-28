@@ -6,7 +6,6 @@ import { SubMenu } from '../../shared/ui/SubMenu';
 import { ShortcutMenuItem } from '../../shared/ui/ShortcutMenuItem';
 import { LinkMenuItem } from '../../shared/ui/LinkMenuItem';
 import { MenuItemWrapper } from '../../shared/ui/MenuItemWrapper';
-import { useStore } from 'effector-react';
 
 type MenuProps = {
   items?: MenuItemSchema[];
@@ -38,12 +37,10 @@ export const Menu = ({ items }: MenuProps) => {
           }
 
           case 'number': {
-            const storeValue = useStore(value!);
-
             return (
               <NumericMenuItem
                 title={label}
-                value={storeValue}
+                value={value!}
                 onChange={(event) => onChange(event.currentTarget.value)}
               />
             );

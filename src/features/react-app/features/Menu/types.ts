@@ -1,5 +1,5 @@
 import { Store } from 'effector';
-import { KeyAction } from '../../../shared';
+import { KeyAction } from '~/features/shared';
 
 export type MenuItemSchema = {
   label: string;

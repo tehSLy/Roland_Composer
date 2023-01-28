@@ -1,8 +1,8 @@
 import { useMemo } from 'react';
-import { Menu } from '../../../features/Menu';
-import { createMenuItems } from '../constants';
-import { ProjectName } from '../../../entities/project/ui/ProjectName';
-import { AppModel } from '../../../../AppModel';
+import { AppModel } from '~/features/AppModel';
+import { createMenuItems } from '~widgets/AppBar/constants';
+import { Menu } from '~features/Menu';
+import { ProjectName } from '~entities/project/ui/ProjectName';
 import tw from 'tailwind-styled-components';
 
 type AppBarProps = {

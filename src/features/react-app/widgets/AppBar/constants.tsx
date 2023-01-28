@@ -1,5 +1,5 @@
-import { MenuItemSchema } from '../../features/Menu/types';
-import { AppModel } from '../../../AppModel';
+import { AppModel } from '~/features/AppModel';
+import { MenuItemSchema } from '~features/Menu/types';
 
 const filePickerApiAvailable =
   'showSaveFilePicker' in window && 'showOpenFilePicker' in window;

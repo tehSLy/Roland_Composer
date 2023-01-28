@@ -35,7 +35,6 @@
     "cssnano": "4.1.11",
     "effector": "^22.2.0",
     "foliage": "^0.201.0",
-    "forest": "^0.20.3",
     "parcel-resolver-tspaths": "^0.0.9",
     "prettier": "2.8.3",
     "postcss": "^8.4.12",

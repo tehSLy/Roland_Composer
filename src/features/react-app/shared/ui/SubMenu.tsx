@@ -20,22 +20,22 @@ export const SubMenu = ({ items }: SubMenuProps) => {
           case "button": {
             return (
               <ButtonMenuItem
-                title={label as Store<string>}
-                disabled={disabled as Store<boolean>}
-                shortcut={meta.shortcut as Store<KeyAction>}
+                $title={label as Store<string>}
+                $disabled={disabled as Store<boolean>}
+                $shortcut={meta.shortcut as Store<KeyAction>}
               />
             );
           }
           case "link": {
             return (
-              <LinkMenuItem title={label as Store<string>} href={meta.url} />
+              <LinkMenuItem $title={label as Store<string>} href={meta.url} />
             );
           }
           case "number": {
             return (
               <NumericMenuItem
-                title={label as Store<string>}
-                value={meta.value as Store<number>}
+                $title={label as Store<string>}
+                $value={meta.value as Store<number>}
                 onChange={(event) =>
                   meta.handler(Number(event.currentTarget.value))
                 }
@@ -45,7 +45,7 @@ export const SubMenu = ({ items }: SubMenuProps) => {
           case "submenu": {
             return (
               <SubMenuItem
-                title={label as Store<string>}
+                $title={label as Store<string>}
                 items={meta.children}
               />
             );

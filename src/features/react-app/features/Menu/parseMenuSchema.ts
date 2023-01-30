@@ -1,18 +1,21 @@
-import { storeOrDataToStore } from "~/lib/storeOrDataToStore";
-import {
-	MenuCommandSchema, MenuDropdownSchema
-} from "./types";
+import { KeyAction } from "~/features/shared";
+import { storeOrDataToStore } from "~/features/shared/libs/storeOrDataToStore";
+import { MenuDropdownSchema, MenuItem } from "./types";
 
 export const parseMenuSchema = (schema: MenuDropdownSchema[]) => {
   return schema.map((schemaItem) => {
-    schemaItem.disabled = storeOrDataToStore(schemaItem.disabled, false);
-    schemaItem.visible = storeOrDataToStore(schemaItem.visible, true);
-    schemaItem.label = storeOrDataToStore(schemaItem.label, "");
-    schemaItem.children = schemaItem.children.map(parseSchemaChild);
+    const newSchemaItem = { ...schemaItem };
+
+    newSchemaItem.disabled = storeOrDataToStore(schemaItem.disabled, false);
+    newSchemaItem.visible = storeOrDataToStore(schemaItem.visible, true);
+    newSchemaItem.label = storeOrDataToStore(schemaItem.label, "");
+    newSchemaItem.children = schemaItem.children.map(parseSchemaChild);
+
+    return newSchemaItem;
   });
 };
 
-const parseSchemaChild = (child: MenuCommandSchema) => {
+const parseSchemaChild = (child: MenuItem) => {
   child.disabled = storeOrDataToStore(child.disabled, false);
   child.label = storeOrDataToStore(child.label, "");
   child.visible = storeOrDataToStore(child.visible, true);
@@ -21,12 +24,15 @@ const parseSchemaChild = (child: MenuCommandSchema) => {
   return child;
 };
 
-const parseMeta = (child: MenuCommandSchema) => {
+const parseMeta = (child: MenuItem) => {
   const newMeta = { ...child.meta } as any;
 
   switch (child.type) {
     case "button":
-      newMeta.shortcut = storeOrDataToStore(child.meta.shortcut, "");
+      newMeta.shortcut = storeOrDataToStore(
+        child.meta.shortcut as KeyAction,
+        "",
+      );
       break;
 
     case "list":

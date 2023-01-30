@@ -4,7 +4,7 @@ import { Input } from "./Input";
 import { MenuItemWrapper } from "./MenuItemWrapper";
 
 type NumericMenuItemProps = {
-  title: string;
+  title: Store<string>;
   value: Store<number>;
   onChange?: React.ChangeEventHandler<HTMLInputElement>;
 };
@@ -15,10 +15,11 @@ export const NumericMenuItem = ({
   onChange,
 }: NumericMenuItemProps) => {
   const storeValue = useStore(value);
+  const storeTitle = useStore(title);
 
   return (
     <MenuItemWrapper>
-      <span>{title}</span>
+      <span>{storeTitle}</span>
       <Input value={storeValue} onChange={onChange} />
     </MenuItemWrapper>
   );

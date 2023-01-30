@@ -1,5 +1,5 @@
 import { createStore, is, Store } from "effector";
-import { StoreOrData } from "forest";
+import { StoreOrData } from "~/features/shared/StoreOrData";
 
 export const storeOrDataToStore = <T>(
   storeOrData: StoreOrData<T> | undefined,

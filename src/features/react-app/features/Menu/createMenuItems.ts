@@ -1,6 +1,9 @@
 import { AppModel } from "~/features/AppModel";
 import { parseMenuSchema } from "./parseMenuSchema";
 
+const filePickerApiAvailable =
+  "showSaveFilePicker" in window && "showOpenFilePicker" in window;
+
 export const createMenuItems = (appModel: AppModel) =>
   parseMenuSchema([
     {
@@ -15,166 +18,149 @@ export const createMenuItems = (appModel: AppModel) =>
         },
         {
           label: "Load...",
-          onClick: appModel.uiModel.loadModal.open,
+          type: "button",
           meta: {
-            href: "",
+            handler: appModel.uiModel.loadModal.open,
           },
         },
         {
           label: "Import...",
-          onClick: appModel.import,
+          type: "button",
           disabled: !filePickerApiAvailable,
           meta: {
-            href: "",
+            handler: appModel.import,
           },
         },
         {
           label: "Export...",
-          onClick: appModel.export,
+          type: "button",
           disabled: !filePickerApiAvailable,
           meta: {
-            href: "",
+            handler: appModel.export,
           },
         },
         {
           label: "Render...",
+          type: "button",
           disabled: true,
-          meta: {
-            href: "",
-          },
+          meta: {},
         },
         {
           label: "Share...",
-          onClick: appModel.share,
+          type: "button",
           meta: {
-            href: "",
+            handler: appModel.share,
           },
         },
       ],
     },
     {
       label: "Composer",
-      type: "button",
-      meta: {
-        href: "",
-        children: [
-          {
-            label: "Set BPM",
-            type: "number",
-            onChange: appModel.deviceModel._bpm.setPosition,
-            meta: {
-              href: "",
-              value: appModel.deviceModel._bpm.position,
-            },
+      children: [
+        {
+          label: "Set BPM",
+          type: "number",
+          meta: {
+            value: appModel.deviceModel._bpm.position,
+            handler: appModel.deviceModel._bpm.setPosition,
           },
-          {
-            label: "Start/Stop",
-            type: "shortcut",
-            onClick: appModel.deviceModel.togglePlay,
-            meta: {
-              href: "",
-              shortcut: "startStop",
-            },
+        },
+        {
+          label: "Start/Stop",
+          type: "button",
+          meta: {
+            shortcut: "startStop",
+            handler: appModel.deviceModel.togglePlay,
           },
-          {
-            label: "Cycle A/B",
-            type: "shortcut",
-            onClick: appModel.deviceModel.cycleABModes,
-            meta: {
-              href: "",
-              shortcut: "cycleAb",
-            },
+        },
+        {
+          label: "Cycle A/B",
+          type: "button",
+          meta: {
+            shortcut: "cycleAb",
+            handler: appModel.deviceModel.cycleABModes,
           },
-          {
-            label: "Clear Pattern",
-            onClick: appModel.deviceModel.clearPattern,
-            meta: {
-              href: "",
-            },
+        },
+        {
+          label: "Clear Pattern",
+          type: "button",
+          meta: {
+            handler: appModel.deviceModel.clearPattern,
           },
-          {
-            label: "Fill in...",
-            type: "submenu",
-            meta: {
-              href: "",
-              children: [
-                {
-                  label: "Every 2th",
-                  onClick: appModel.deviceModel.fillInEvery.prepend(
+        },
+        {
+          label: "Fill in...",
+          type: "submenu",
+          meta: {
+            children: [
+              {
+                label: "Every 2th",
+                type: "button",
+                meta: {
+                  handler: appModel.deviceModel.fillInEvery.prepend(
                     (_: void) => 2,
                   ),
-                  meta: {
-                    href: "",
-                  },
                 },
-                {
-                  label: "Every 4th",
-                  onClick: appModel.deviceModel.fillInEvery.prepend(
+              },
+              {
+                label: "Every 4th",
+                type: "button",
+                meta: {
+                  handler: appModel.deviceModel.fillInEvery.prepend(
                     (_: void) => 4,
                   ),
-                  meta: {
-                    href: "",
-                  },
                 },
-                {
-                  label: "Every 8th",
-                  onClick: appModel.deviceModel.fillInEvery.prepend(
+              },
+              {
+                label: "Every 8th",
+                type: "button",
+                meta: {
+                  handler: appModel.deviceModel.fillInEvery.prepend(
                     (_: void) => 8,
                   ),
-                  meta: {
-                    href: "",
-                  },
                 },
-              ],
-            },
+              },
+            ],
           },
-        ],
-      },
+        },
+      ],
     },
     {
       label: "View",
-      type: "button",
-      meta: {
-        href: "",
-        children: [
-          {
-            label: "Toggle Keybindings",
-            onClick: appModel.uiModel.toggleKeybindingsVisible,
-            meta: {
-              href: "",
-            },
+      children: [
+        {
+          label: "Toggle Keybindings",
+          type: "button",
+          meta: {
+            handler: appModel.uiModel.toggleKeybindingsVisible,
           },
-          {
-            label: "Toggle History",
-            onClick: appModel.uiModel.toggleHistoryVisible,
-            meta: {
-              href: "",
-            },
+        },
+        {
+          label: "Toggle History",
+          type: "button",
+          meta: {
+            handler: appModel.uiModel.toggleHistoryVisible,
           },
-        ],
-      },
+        },
+      ],
     },
     {
       label: "Help",
-      type: "button",
-      meta: {
-        href: "",
-        children: [
-          {
-            label: "Open manual...",
-            type: "link",
-            meta: {
-              href: "http://cdn.roland.com/assets/media/pdf/TR-808_OM.pdf",
-            },
+      children: [
+        {
+          label: "Open manual...",
+          type: "link",
+          meta: {
+            url: "http://cdn.roland.com/assets/media/pdf/TR-808_OM.pdf",
           },
-          {
-            label: "About...",
-            onClick: appModel.uiModel.aboutModal.open,
-            meta: {
-              href: "",
-            },
+        },
+        {
+          label: "About...",
+          type: "button",
+          meta: {
+            handler: appModel.uiModel.aboutModal.open,
           },
-        ],
-      },
+        },
+      ],
     },
   ]);

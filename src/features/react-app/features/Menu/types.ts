@@ -1,64 +1,49 @@
 import { Effect, Event, Unit } from "effector";
+import { KeyAction } from "~/features/shared";
 import { StoreOrData } from "~/features/shared/StoreOrData";
 
-export type MenuCommandSchema =
-  | MenuNumberCommandSchema
-  | MenuSubmenuCommandSchema
-  | MenuLinkCommandSchema
-  | MenuButtonCommandSchema
-  | MenuListCommandSchema;
+type MenuItemTypeMap = {
+  number: NumberMeta;
+  submenu: SubmenuMeta;
+  link: LinkMeta;
+  button: ButtonMeta;
+  list: ListMeta;
+};
 
-interface MenuCommandSchemaBase {
-  disabled?: StoreOrData<boolean>;
-  visible?: StoreOrData<boolean>;
-  label: StoreOrData<string>;
-}
+export type MenuItem = {
+  [K in keyof MenuItemTypeMap]: {
+    label: StoreOrData<string>;
+    type: K;
+    disabled?: StoreOrData<boolean>;
+    visible?: StoreOrData<boolean>;
+    meta: MenuItemTypeMap[K];
+  };
+}[keyof MenuItemTypeMap];
 
-interface MenuNumberCommandSchema extends MenuCommandSchemaBase {
-  type: "number";
-  meta: MenuCommandNumberTypeMeta;
-}
-interface MenuSubmenuCommandSchema extends MenuCommandSchemaBase {
-  type: "submenu";
-  meta: MenuCommandSubmenuTypeMeta;
-}
-interface MenuLinkCommandSchema extends MenuCommandSchemaBase {
-  type: "link";
-  meta: MenuCommandLinkTypeMeta;
-}
-interface MenuButtonCommandSchema extends MenuCommandSchemaBase {
-  type: "button";
-  meta: MenuCommandButtonTypeMeta;
-}
-interface MenuListCommandSchema extends MenuCommandSchemaBase {
-  type: "list";
-  meta: MenuCommandListTypeMeta;
-}
-
-export type MenuCommandSubmenuTypeMeta = {
-  children: MenuCommandSchema[];
+export type SubmenuMeta = {
+  children: MenuItem[];
   handler?: Unit<{ key: string; index: number }>;
 };
 
-export type MenuCommandListTypeMeta = {
+export type ListMeta = {
   children: StoreOrData<string[]>;
   handler?: Unit<{ key: string; index: number }>;
 };
 
-export type MenuCommandNumberTypeMeta = {
-  value?: StoreOrData<number>;
+export type NumberMeta = {
+  value: StoreOrData<number>;
   from?: number;
   to?: number;
-  handler?: Event<number>;
+  handler: Event<number>;
 };
 
-export type MenuCommandLinkTypeMeta = {
+export type LinkMeta = {
   url: string;
   openIn?: "newTab" | "sameTab";
 };
 
-export type MenuCommandButtonTypeMeta = {
-  shortcut?: StoreOrData<string>;
+export type ButtonMeta = {
+  shortcut?: StoreOrData<KeyAction>;
   handler?:
     | Event<MouseEvent>
     | Effect<MouseEvent, any, any>
@@ -68,7 +53,7 @@ export type MenuCommandButtonTypeMeta = {
 
 export type MenuDropdownSchema = {
   label: StoreOrData<string>;
-  children: MenuCommandSchema[];
+  children: MenuItem[];
   visible?: StoreOrData<boolean>;
   disabled?: StoreOrData<boolean>;
 };

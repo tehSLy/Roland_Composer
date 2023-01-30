@@ -1,6 +1,20 @@
+import { Store } from "effector";
+import { useStore } from "effector-react";
 import tw from "tailwind-styled-components";
 
-export const Button = tw.button`
+type ButtonProps = {
+  title: Store<string>;
+  disabled: Store<boolean>;
+};
+
+export const Button = ({ title, disabled }: ButtonProps) => {
+  const storeTitle = useStore(title);
+  const storeDisabled = useStore(disabled);
+
+  return <ButtonWrapper disabled={storeDisabled}>{storeTitle}</ButtonWrapper>;
+};
+
+const ButtonWrapper = tw.button`
   select-none
   font-sans
   tracking-tight

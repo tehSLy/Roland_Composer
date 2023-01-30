@@ -4,32 +4,30 @@ import { KeyAction, resolveKeyLabel, resolveShortcut } from "~/features/shared";
 import { MenuItemWrapper } from "./MenuItemWrapper";
 
 type ButtonMenuItemProps = {
-  title: Store<string>;
-  disabled: Store<boolean>;
-  shortcut?: Store<KeyAction>;
+  $title: Store<string>;
+  $disabled: Store<boolean>;
+  $shortcut?: Store<KeyAction>;
 };
 
 export const ButtonMenuItem = ({
-  title,
-  disabled,
-  shortcut,
+  $title,
+  $disabled,
+  $shortcut,
 }: ButtonMenuItemProps) => {
-  const storeTitle = useStore(title);
-  const storeDisabled = useStore(disabled);
+  const title = useStore($title);
+  const isDisabled = useStore($disabled);
 
-  if (!shortcut) {
-    return (
-      <MenuItemWrapper disabled={storeDisabled}>{storeTitle}</MenuItemWrapper>
-    );
+  if (!$shortcut) {
+    return <MenuItemWrapper disabled={isDisabled}>{title}</MenuItemWrapper>;
   }
 
-  const storeShortcut = useStore(shortcut);
+  const shortcut = useStore($shortcut);
 
-  const resolvedShortcut = resolveKeyLabel(resolveShortcut(storeShortcut));
+  const resolvedShortcut = resolveKeyLabel(resolveShortcut(shortcut));
 
   return (
-    <MenuItemWrapper disabled={storeDisabled}>
-      {storeTitle}
+    <MenuItemWrapper disabled={isDisabled}>
+      {title}
       <span>{resolvedShortcut}</span>
     </MenuItemWrapper>
   );

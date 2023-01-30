@@ -6,18 +6,18 @@ import { MenuItemWrapper } from "./MenuItemWrapper";
 import { SubMenu } from "./SubMenu";
 
 type SubMenuItemProps = {
-  title: Store<string>;
+  $title: Store<string>;
   items: MenuItem[];
 };
 
-export const SubMenuItem = ({ title, items }: SubMenuItemProps) => {
-  const storeTitle = useStore(title);
+export const SubMenuItem = ({ $title, items }: SubMenuItemProps) => {
+  const title = useStore($title);
 
   return (
     <Dropdown
       anchorComponent={
         <MenuItemWrapper>
-          {storeTitle}
+          {title}
           <span>▸</span>
         </MenuItemWrapper>
       }

@@ -3,11 +3,11 @@ import { useStore } from "effector-react";
 import tw from "tailwind-styled-components";
 
 type ButtonProps = {
-  $title: Store<string>;
-  $disabled: Store<boolean>;
+  title: Store<string>;
+  disabled: Store<boolean>;
 };
 
-export const Button = ({ $title, $disabled }: ButtonProps) => {
+export const Button = ({ title: $title, disabled: $disabled }: ButtonProps) => {
   const title = useStore($title);
   const isDisabled = useStore($disabled);
 

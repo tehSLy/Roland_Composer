@@ -6,11 +6,11 @@ import { MenuItemWrapper } from "./MenuItemWrapper";
 import { SubMenu } from "./SubMenu";
 
 type SubMenuItemProps = {
-  $title: Store<string>;
+  title: Store<string>;
   items: MenuItem[];
 };
 
-export const SubMenuItem = ({ $title, items }: SubMenuItemProps) => {
+export const SubMenuItem = ({ title: $title, items }: SubMenuItemProps) => {
   const title = useStore($title);
 
   return (

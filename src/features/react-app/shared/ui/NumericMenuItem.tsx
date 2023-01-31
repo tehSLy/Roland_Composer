@@ -4,14 +4,14 @@ import { Input } from "./Input";
 import { MenuItemWrapper } from "./MenuItemWrapper";
 
 type NumericMenuItemProps = {
-  $title: Store<string>;
-  $value: Store<number>;
+  title: Store<string>;
+  value: Store<number>;
   onChange?: React.ChangeEventHandler<HTMLInputElement>;
 };
 
 export const NumericMenuItem = ({
-  $title,
-  $value,
+  title: $title,
+  value: $value,
   onChange,
 }: NumericMenuItemProps) => {
   const value = useStore($value);

@@ -16,8 +16,8 @@ export const Menu = ({ items }: MenuProps) => {
           <Dropdown
             anchorComponent={
               <Button
-                $title={item.label as Store<string>}
-                $disabled={item.disabled as Store<boolean>}
+                title={item.label as Store<string>}
+                disabled={item.disabled as Store<boolean>}
               />
             }
             placement="bottomLeft"

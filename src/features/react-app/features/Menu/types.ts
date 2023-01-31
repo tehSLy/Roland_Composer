@@ -2,9 +2,9 @@ import { Effect, Event, Unit } from "effector";
 import { KeyAction } from "~/features/shared";
 import { StoreOrData } from "~/features/shared/StoreOrData";
 
-type MenuItemTypeMap = {
+export type MenuItemTypeMap = {
   number: NumberMeta;
-  submenu: SubmenuMeta;
+  submenu: SubMenuMeta;
   link: LinkMeta;
   button: ButtonMeta;
   list: ListMeta;
@@ -20,7 +20,7 @@ export type MenuItem = {
   };
 }[keyof MenuItemTypeMap];
 
-export type SubmenuMeta = {
+export type SubMenuMeta = {
   children: MenuItem[];
   handler?: Unit<{ key: string; index: number }>;
 };

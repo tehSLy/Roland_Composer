@@ -6,7 +6,7 @@ import { MenuItemWrapper } from "./MenuItemWrapper";
 type ButtonMenuItemProps = {
   title: Store<string>;
   disabled: Store<boolean>;
-  shortcut?: Store<KeyAction>;
+  shortcut: Store<KeyAction>;
 };
 
 export const ButtonMenuItem = ({
@@ -16,12 +16,11 @@ export const ButtonMenuItem = ({
 }: ButtonMenuItemProps) => {
   const title = useStore($title);
   const isDisabled = useStore($disabled);
+  const shortcut = useStore($shortcut);
 
   if (!$shortcut) {
     return <MenuItemWrapper disabled={isDisabled}>{title}</MenuItemWrapper>;
   }
-
-  const shortcut = useStore($shortcut);
 
   const resolvedShortcut = resolveKeyLabel(resolveShortcut(shortcut));
 

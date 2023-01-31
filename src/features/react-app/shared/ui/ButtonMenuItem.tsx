@@ -7,12 +7,14 @@ type ButtonMenuItemProps = {
   title: Store<string>;
   disabled: Store<boolean>;
   shortcut: Store<KeyAction>;
+  onClick?: React.MouseEventHandler;
 };
 
 export const ButtonMenuItem = ({
   title: $title,
   disabled: $disabled,
   shortcut: $shortcut,
+  onClick,
 }: ButtonMenuItemProps) => {
   const title = useStore($title);
   const isDisabled = useStore($disabled);
@@ -25,7 +27,7 @@ export const ButtonMenuItem = ({
   });
 
   return (
-    <MenuItemWrapper disabled={isDisabled}>
+    <MenuItemWrapper disabled={isDisabled} onClick={onClick}>
       {title}
       {resolvedShortcut && <span>{resolvedShortcut}</span>}
     </MenuItemWrapper>

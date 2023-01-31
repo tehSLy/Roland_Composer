@@ -1,134 +1,123 @@
 import { AppModel } from "~/features/AppModel";
-import { MenuItemSchema } from "~features/Menu/types";
+import { parseMenuSchema } from "./parseMenuSchema";
 
 const filePickerApiAvailable =
   "showSaveFilePicker" in window && "showOpenFilePicker" in window;
 
-export const createMenuItems = (appModel: AppModel): MenuItemSchema[] => [
-  {
-    label: "Menu",
-    type: "button",
-    meta: {
-      href: "",
+export const createMenuItems = (appModel: AppModel) =>
+  parseMenuSchema([
+    {
+      label: "Menu",
       children: [
         {
           label: "Save...",
-          onClick: appModel.uiModel.saveModal.open,
+          type: "button",
           meta: {
-            href: "",
+            handler: appModel.uiModel.saveModal.open,
           },
         },
         {
           label: "Load...",
-          onClick: appModel.uiModel.loadModal.open,
+          type: "button",
           meta: {
-            href: "",
+            handler: appModel.uiModel.loadModal.open,
           },
         },
         {
           label: "Import...",
-          onClick: appModel.import,
+          type: "button",
           disabled: !filePickerApiAvailable,
           meta: {
-            href: "",
+            handler: appModel.import,
           },
         },
         {
           label: "Export...",
-          onClick: appModel.export,
+          type: "button",
           disabled: !filePickerApiAvailable,
           meta: {
-            href: "",
+            handler: appModel.export,
           },
         },
         {
           label: "Render...",
+          type: "button",
           disabled: true,
-          meta: {
-            href: "",
-          },
+          meta: {},
         },
         {
           label: "Share...",
-          onClick: appModel.share,
+          type: "button",
           meta: {
-            href: "",
+            handler: appModel.share,
           },
         },
       ],
     },
-  },
-  {
-    label: "Composer",
-    type: "button",
-    meta: {
-      href: "",
+    {
+      label: "Composer",
       children: [
         {
           label: "Set BPM",
           type: "number",
-          onChange: appModel.deviceModel._bpm.setPosition,
           meta: {
-            href: "",
             value: appModel.deviceModel._bpm.position,
+            handler: appModel.deviceModel._bpm.setPosition,
           },
         },
         {
           label: "Start/Stop",
-          type: "shortcut",
-          onClick: appModel.deviceModel.togglePlay,
+          type: "button",
           meta: {
-            href: "",
             shortcut: "startStop",
+            handler: appModel.deviceModel.togglePlay,
           },
         },
         {
           label: "Cycle A/B",
-          type: "shortcut",
-          onClick: appModel.deviceModel.cycleABModes,
+          type: "button",
           meta: {
-            href: "",
             shortcut: "cycleAb",
+            handler: appModel.deviceModel.cycleABModes,
           },
         },
         {
           label: "Clear Pattern",
-          onClick: appModel.deviceModel.clearPattern,
+          type: "button",
           meta: {
-            href: "",
+            handler: appModel.deviceModel.clearPattern,
           },
         },
         {
           label: "Fill in...",
           type: "submenu",
           meta: {
-            href: "",
             children: [
               {
                 label: "Every 2th",
-                onClick: appModel.deviceModel.fillInEvery.prepend(
-                  (_: void) => 2,
-                ),
+                type: "button",
                 meta: {
-                  href: "",
+                  handler: appModel.deviceModel.fillInEvery.prepend(
+                    (_: void) => 2,
+                  ),
                 },
               },
               {
                 label: "Every 4th",
-                onClick: appModel.deviceModel.fillInEvery.prepend(
-                  (_: void) => 4,
-                ),
+                type: "button",
                 meta: {
-                  href: "",
+                  handler: appModel.deviceModel.fillInEvery.prepend(
+                    (_: void) => 4,
+                  ),
                 },
               },
               {
                 label: "Every 8th",
-                onClick: appModel.deviceModel.fillInEvery.prepend(
-                  (_: void) => 8,
-                ),
+                type: "button",
                 meta: {
-                  href: "",
+                  handler: appModel.deviceModel.fillInEvery.prepend(
+                    (_: void) => 8,
+                  ),
                 },
               },
             ],
@@ -136,51 +125,42 @@ export const createMenuItems = (appModel: AppModel): MenuItemSchema[] => [
         },
       ],
     },
-  },
-  {
-    label: "View",
-    type: "button",
-    meta: {
-      href: "",
+    {
+      label: "View",
       children: [
         {
           label: "Toggle Keybindings",
-          onClick: appModel.uiModel.toggleKeybindingsVisible,
+          type: "button",
           meta: {
-            href: "",
+            handler: appModel.uiModel.toggleKeybindingsVisible,
           },
         },
         {
           label: "Toggle History",
-          onClick: appModel.uiModel.toggleHistoryVisible,
+          type: "button",
           meta: {
-            href: "",
+            handler: appModel.uiModel.toggleHistoryVisible,
           },
         },
       ],
     },
-  },
-  {
-    label: "Help",
-    type: "button",
-    meta: {
-      href: "",
+    {
+      label: "Help",
       children: [
         {
           label: "Open manual...",
           type: "link",
           meta: {
-            href: "http://cdn.roland.com/assets/media/pdf/TR-808_OM.pdf",
+            url: "http://cdn.roland.com/assets/media/pdf/TR-808_OM.pdf",
           },
         },
         {
           label: "About...",
-          onClick: appModel.uiModel.aboutModal.open,
+          type: "button",
           meta: {
-            href: "",
+            handler: appModel.uiModel.aboutModal.open,
           },
         },
       ],
     },
-  },
-];
+  ]);

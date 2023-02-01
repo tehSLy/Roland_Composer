@@ -18,7 +18,7 @@ export const ButtonMenuItem = ({
   const isDisabled = useStore($disabled);
   const shortcut = useStore($shortcut);
 
-  if (!$shortcut) {
+  if (!shortcut) {
     return <MenuItemWrapper disabled={isDisabled}>{title}</MenuItemWrapper>;
   }
 

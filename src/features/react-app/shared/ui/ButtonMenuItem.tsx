@@ -1,5 +1,5 @@
 import { Store } from "effector";
-import { useStore } from "effector-react";
+import { useStore, useStoreMap } from "effector-react";
 import { KeyAction, resolveKeyLabel, resolveShortcut } from "~/features/shared";
 import { MenuItemWrapper } from "./MenuItemWrapper";
 
@@ -16,18 +16,18 @@ export const ButtonMenuItem = ({
 }: ButtonMenuItemProps) => {
   const title = useStore($title);
   const isDisabled = useStore($disabled);
-  const shortcut = useStore($shortcut);
 
-  if (!shortcut) {
-    return <MenuItemWrapper disabled={isDisabled}>{title}</MenuItemWrapper>;
-  }
-
-  const resolvedShortcut = resolveKeyLabel(resolveShortcut(shortcut));
+  const resolvedShortcut = useStoreMap({
+    store: $shortcut,
+    keys: [],
+    fn: (shortcut) =>
+      shortcut ? resolveKeyLabel(resolveShortcut(shortcut)) : "",
+  });
 
   return (
     <MenuItemWrapper disabled={isDisabled}>
       {title}
-      <span>{resolvedShortcut}</span>
+      {resolvedShortcut && <span>{resolvedShortcut}</span>}
     </MenuItemWrapper>
   );
 };

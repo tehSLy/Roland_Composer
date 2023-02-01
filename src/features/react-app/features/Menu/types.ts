@@ -45,10 +45,8 @@ export type LinkMeta = {
 export type ButtonMeta = {
   shortcut?: StoreOrData<KeyAction>;
   handler?:
-    | Event<MouseEvent>
-    | Effect<MouseEvent, any, any>
-    | Event<void>
-    | Effect<void, any, any>;
+    | Event<React.MouseEvent<Element, MouseEvent> | void>
+    | Effect<React.MouseEvent<Element, MouseEvent> | void, any, any>;
 };
 
 export type MenuDropdownSchema = {

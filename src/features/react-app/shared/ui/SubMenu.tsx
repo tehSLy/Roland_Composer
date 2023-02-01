@@ -23,6 +23,7 @@ export const SubMenu = ({ items }: SubMenuProps) => {
                 title={label as Store<string>}
                 disabled={disabled as Store<boolean>}
                 shortcut={meta.shortcut as Store<KeyAction>}
+                onClick={(event) => meta.handler?.(event)}
               />
             );
           }

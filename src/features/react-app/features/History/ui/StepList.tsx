@@ -92,13 +92,19 @@ const modeLabelMap: Record<PlayerMode, string> = {
 };
 
 const resolveValue = (type: HistoryActionType, value: any) => {
-  const map: Record<HistoryActionType, string> = {
-    AB: aBLabelMap[value as ABMode],
-    BPM: value,
-    INSTRUMENT: instrumentLabelMap[value as InstrumentsKeys],
-    MODE: modeLabelMap[value as PlayerMode],
-    VOLUME: value,
-  };
+  switch (type) {
+    case "AB":
+      return aBLabelMap[value as ABMode];
+    case "BPM":
+      return value;
+    case "INSTRUMENT":
+      return instrumentLabelMap[value as InstrumentsKeys];
+    case "MODE":
+      return modeLabelMap[value as PlayerMode];
+    case "VOLUME":
+      return value;
 
-  return map[type] || "Unknown";
+    default:
+      return "Unknown";
+  }
 };

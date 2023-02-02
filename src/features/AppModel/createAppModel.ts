@@ -272,5 +272,3 @@ const gatherObjects = (controls: Record<string, any>) => {
 };
 
 export type AppModel = ReturnType<typeof createAppModel>;
-
-export const appModel = createAppModel();

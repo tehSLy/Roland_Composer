@@ -1,8 +1,6 @@
 import { createRoot } from "react-dom/client";
 import { App } from "./features/react-app/app/app";
-import { createAppModel } from "./features/AppModel";
-
-const appModel = createAppModel();
+import { appModel } from "./model";
 
 const root = createRoot(document.getElementById("root") as HTMLElement);
 

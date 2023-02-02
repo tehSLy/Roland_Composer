@@ -3,7 +3,7 @@ import { useEffect, useRef } from "react";
 import { AppBar } from "~widgets/AppBar";
 import { AppModel } from "~/features/AppModel";
 import { LoadingIndicator } from "~shared/ui/LoadingIndicator";
-import { History } from "../features/History/ui/History";
+import { History } from "../features/History";
 
 type AppProps = {
   appModel: AppModel;

@@ -1,6 +1,6 @@
 import { Store } from "effector";
 import { useStore } from "effector-react";
-import { Typography } from "../../../shared/ui/Typography";
+import { Typography } from "~shared/ui/Typography";
 import { StepList } from "./StepList";
 import tw from "tailwind-styled-components";
 

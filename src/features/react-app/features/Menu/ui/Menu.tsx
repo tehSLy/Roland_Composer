@@ -2,7 +2,7 @@ import { Store } from "effector";
 import { Button } from "~shared/ui/Button";
 import { Dropdown } from "~shared/ui/Dropdown";
 import { SubMenu } from "~shared/ui/SubMenu";
-import { MenuDropdownSchema } from "./types";
+import { MenuDropdownSchema } from "../types";
 
 type MenuProps = {
   items: MenuDropdownSchema[];

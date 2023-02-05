@@ -2,8 +2,9 @@ import { useStore } from "effector-react";
 import { useEffect, useRef } from "react";
 import { AppBar } from "~widgets/AppBar";
 import { AppModel } from "~/features/AppModel";
+import { History } from "~features/History";
+import { KeyMapping } from "~features/KeyMapping";
 import { LoadingIndicator } from "~shared/ui/LoadingIndicator";
-import { History } from "../features/History";
 
 type AppProps = {
   appModel: AppModel;
@@ -24,6 +25,7 @@ export const App = ({ appModel }: AppProps) => {
     <>
       <LoadingIndicator isVisible={isAppLoading} />
       <History visible={appModel.uiModel.historyVisible} />
+      <KeyMapping />
       <AppBar appModel={appModel} />
       <div ref={sceneElementRef}></div>
     </>

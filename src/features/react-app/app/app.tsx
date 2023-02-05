@@ -25,7 +25,7 @@ export const App = ({ appModel }: AppProps) => {
     <>
       <LoadingIndicator isVisible={isAppLoading} />
       <History visible={appModel.uiModel.historyVisible} />
-      <KeyMapping />
+      <KeyMapping visible={appModel.uiModel.keybindingsVisible} />
       <AppBar appModel={appModel} />
       <div ref={sceneElementRef}></div>
     </>

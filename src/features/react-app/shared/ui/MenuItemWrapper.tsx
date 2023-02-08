@@ -12,17 +12,17 @@ export const MenuItemWrapper = tw.li<MenuItemWrapperProps>`
   px-5
   py-1
   w-full
-  grid
-  grid-cols-[auto_minmax(auto,4rem)]
-  items-end
+  flex
+  justify-between
   gap-x-4
   font-sans
   tracking-tight
-  text-sm 
+  text-sm
+  select-none
   hover:text-gray-100 
   hover:bg-slate-500 
   text-gray-300
   ${({ disabled }) =>
     disabled &&
     "text-neutral-400 hover:bg-inherit hover:text-neutral-400 cursor-default"}
-  `;
+`;

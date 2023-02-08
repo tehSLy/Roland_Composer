@@ -28,7 +28,7 @@ export const ButtonMenuItem = ({
 
   return (
     <MenuItemWrapper disabled={isDisabled} onClick={onClick}>
-      {title}
+      <span>{title}</span>
       {resolvedShortcut && <span>{resolvedShortcut}</span>}
     </MenuItemWrapper>
   );

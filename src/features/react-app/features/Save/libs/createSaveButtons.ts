@@ -1,4 +1,4 @@
-import { attach } from "effector";
+import { attach, createEffect } from "effector";
 import { Project } from "~/features/App/SaveLoadModal/Project";
 import { AppModel } from "~/features/AppModel";
 import { SelectableListModel } from "~/ui/SelectableList/createSelectableListModel";
@@ -15,10 +15,12 @@ export const createSaveButtons = (
         source: listModel.input,
       }),
       label: "Save",
+      disabled: false,
     },
     {
       handler: appModel.uiModel.saveModal.close,
       label: "Cancel",
+      disabled: false,
     },
   ]);
 };

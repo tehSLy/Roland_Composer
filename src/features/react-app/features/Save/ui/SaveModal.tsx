@@ -1,7 +1,7 @@
-import { attach, createStore } from "effector";
 import { useMemo } from "react";
 import { Project } from "~/features/App/SaveLoadModal/Project";
 import { AppModel } from "~/features/AppModel";
+import { ProjectsList } from "~entities/project/ui/ProjectsList";
 import { createSelectableListModel } from "~/ui/SelectableList/createSelectableListModel";
 import { Modal } from "~shared/ui/Modal";
 import { createSaveButtons } from "../libs/createSaveButtons";
@@ -25,8 +25,15 @@ export const SaveModal = ({ appModel }: SaveModalProps) => {
 
   const saveButtons = useMemo(
     () => createSaveButtons(appModel, listModel),
-    [appModel],
+    [appModel, listModel],
   );
 
-  return <Modal title="Save Project in browser..." buttons={saveButtons} />;
+  return (
+    <Modal
+      model={appModel.uiModel.saveModal}
+      title="Save Project in browser..."
+      body={<ProjectsList model={listModel} />}
+      buttons={saveButtons}
+    />
+  );
 };

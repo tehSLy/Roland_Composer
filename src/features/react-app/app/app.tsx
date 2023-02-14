@@ -5,6 +5,7 @@ import { AppModel } from "~/features/AppModel";
 import { History } from "~features/History";
 import { KeyMapping } from "~features/KeyMapping";
 import { LoadingIndicator } from "~shared/ui/LoadingIndicator";
+import { SaveModal } from "~features/Save/ui/SaveModal";
 
 type AppProps = {
   appModel: AppModel;
@@ -27,6 +28,7 @@ export const App = ({ appModel }: AppProps) => {
       <History visible={appModel.uiModel.historyVisible} />
       <KeyMapping visible={appModel.uiModel.keybindingsVisible} />
       <AppBar appModel={appModel} />
+      <SaveModal appModel={appModel} />
       <div ref={sceneElementRef}></div>
     </>
   );

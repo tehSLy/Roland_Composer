@@ -147,7 +147,6 @@ export const createAppModel = () => {
   const fxSave = attach({
     source: composer.snapshot.state,
     effect(state, filename: string) {
-      console.log(123);
       return { snapshot: state, filename };
     },
   });
@@ -167,10 +166,13 @@ export const createAppModel = () => {
     },
   });
   $savedProjects
-    .on(fxSave.doneData, (state, { filename, snapshot }) => ({
-      ...state,
-      [filename]: snapshot,
-    }))
+    .on(fxSave.doneData, (state, { filename, snapshot }) => {
+      if (!filename.trim()) return;
+      return {
+        ...state,
+        [filename]: snapshot,
+      };
+    })
     .on(
       fxDelete.doneData,
       (state, name) => (

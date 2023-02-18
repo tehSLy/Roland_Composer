@@ -17,7 +17,7 @@ export const SubMenuItem = ({ title: $title, items }: SubMenuItemProps) => {
     <Dropdown
       anchorComponent={
         <MenuItemWrapper>
-          {title}
+          <span>{title}</span>
           <span>▸</span>
         </MenuItemWrapper>
       }

@@ -20,7 +20,7 @@ export const NumericMenuItem = ({
   return (
     <MenuItemWrapper>
       <span>{title}</span>
-      <Input value={value} onChange={onChange} className="w-16" />
+      <Input value={value} onChange={onChange} className="text-right" />
     </MenuItemWrapper>
   );
 };

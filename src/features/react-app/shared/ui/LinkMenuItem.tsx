@@ -13,7 +13,7 @@ export const LinkMenuItem = ({ title: $title, href }: LinkMenuItemProps) => {
   return (
     <li>
       <MenuItemWrapper $as={"a"} href={href}>
-        {title}
+        <span>{title}</span>
       </MenuItemWrapper>
     </li>
   );

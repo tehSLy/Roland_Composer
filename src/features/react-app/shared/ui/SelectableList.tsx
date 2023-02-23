@@ -18,7 +18,6 @@ export const SelectableList = <T,>({
       <ListWrapper>{items}</ListWrapper>
       <Input
         autoFocus
-        className="mb-1"
         value={inputValue}
         onChange={model.setInputValue.prepend((e) => e.target.value)}
       />

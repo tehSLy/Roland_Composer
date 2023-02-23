@@ -1,6 +1,6 @@
 import { Store } from "effector";
 import { useStore } from "effector-react";
-import { MenuItem } from "../../features/Menu/types";
+import { MenuItem } from "../../features/Menu/libs/types";
 import { Dropdown } from "./Dropdown";
 import { MenuItemWrapper } from "./MenuItemWrapper";
 import { SubMenu } from "./SubMenu";

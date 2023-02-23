@@ -1,14 +1,14 @@
 import { attach } from "effector";
 import { Project } from "~/features/App/SaveLoadModal/Project";
 import { AppModel } from "~/features/AppModel";
+import { parseModalButtons } from "~/features/react-app/shared/libs/parseModalButtons";
 import { SelectableListModel } from "~/ui/SelectableList/createSelectableListModel";
-import { parseButtons } from "./parseButtons";
 
 export const createSaveButtons = (
   appModel: AppModel,
   listModel: SelectableListModel<Project>,
 ) => {
-  return parseButtons([
+  return parseModalButtons([
     {
       handler: attach({
         effect: appModel.savedProjects.save,
@@ -29,7 +29,7 @@ export const createLoadButtons = (
   appModel: AppModel,
   listModel: SelectableListModel<Project>,
 ) => {
-  return parseButtons([
+  return parseModalButtons([
     {
       handler: attach({
         effect: appModel.savedProjects.load,

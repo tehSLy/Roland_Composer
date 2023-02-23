@@ -98,6 +98,7 @@ const ModalWrapper = tw.div`
 `;
 
 const ModalActions = tw.div`
+  mt-1
   px-1
   flex
   items-center

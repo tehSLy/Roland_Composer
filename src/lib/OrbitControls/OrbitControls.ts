@@ -1,3 +1,5 @@
+/* eslint-disable */
+//@ts-nocheck
 import {
   EventDispatcher,
   MOUSE,
@@ -25,11 +27,11 @@ class OrbitControls extends EventDispatcher {
 
     if (domElement === undefined)
       console.warn(
-        'THREE.OrbitControls: The second parameter "domElement" is now mandatory.',
+        "THREE.OrbitControls: The second parameter \"domElement\" is now mandatory.",
       );
     if (domElement === document)
       console.error(
-        'THREE.OrbitControls: "document" should not be used as the target "domElement". Please use "renderer.domElement" instead.',
+        "THREE.OrbitControls: \"document\" should not be used as the target \"domElement\". Please use \"renderer.domElement\" instead.",
       );
 
     this.object = object;

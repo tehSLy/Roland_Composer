@@ -111,5 +111,3 @@ const projectMouse = (camera: THREE.Camera) => {
     mouse,
   };
 };
-
-const hightlightMaterial = new THREE.MeshBasicMaterial({ color: 0xffffaa });

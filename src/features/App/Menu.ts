@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { MenuBar } from "../../ui/Menu/MenuBar";
 import { AppModel } from "../AppModel";
 import { resolveKeyLabel, resolveShortcut } from "../shared";

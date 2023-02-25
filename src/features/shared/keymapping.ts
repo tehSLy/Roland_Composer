@@ -100,8 +100,6 @@ const ActionsMap: Record<KeyAction, string> = {
   toggleGui: "Toggle GUI",
 };
 
-const KeysMap = {};
-
 export const resolveKeyLabel = (input: string) => {
   const parsed = input.replace(regexp, "$2");
 
@@ -110,10 +108,6 @@ export const resolveKeyLabel = (input: string) => {
 };
 
 const regexp = /(Key|Digit)(\d|\w)/;
-
-const SpecialCharsSubstitutionMap: Record<string, string> = {
-  PLUS_SIGN: "+",
-};
 
 export const resolveActionLabel = (action: KeyAction) => {
   return ActionsMap[action] || "None";

@@ -9,10 +9,6 @@ import {
 } from "../../Player/shared/constants";
 import { HistoryAction, HistoryActionType } from "./HistoryActionType";
 
-type Config<T> = {
-  actions: T;
-};
-
 export const History = <A extends Event<HistoryAction>[]>({
   actions,
   visible,

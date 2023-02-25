@@ -6,6 +6,7 @@ import {
   guard,
   Store,
 } from "effector";
+import { noop } from "lodash";
 import throttle from "lodash.throttle";
 import { clamp } from "ramda";
 import * as THREE from "three";
@@ -26,10 +27,10 @@ export const createDragManager = ({
 }: {
   intersectionsManager: IntersectionsManager;
 }) => {
-  let activeElementCache = null;
-  let mousePositionCache = new Vector2(0, 0);
+  const mousePositionCache = new Vector2(0, 0);
   let currentDragHandlerCache: ((distance: number) => void) | null = null;
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const onDragEnd = createEffect((_: any) => null);
   const onDrag = createEffect((event: MouseEvent) => {
     const distance = event.x - mousePositionCache.x;
@@ -74,8 +75,6 @@ export const createDragManager = ({
         });
 
         mousePositionCache.set(params.event.x, params.event.y);
-
-        activeElementCache = params.activeElement;
 
         currentDragHandlerCache = handlers.onDrag;
       },
@@ -153,7 +152,7 @@ export const createDragManager = ({
 
           config.handler(config.dictionary[resultIdx]);
         },
-        onEnd: () => {},
+        onEnd: noop,
       },
     });
   };
@@ -188,7 +187,7 @@ export const createDragManager = ({
           );
           config.handler(clamped as C);
         },
-        onEnd() {},
+        onEnd: noop,
       },
     });
   };

@@ -15,7 +15,6 @@ import {
   createDragManager,
   createIntersectionsManager,
   createKeyPressManager,
-  createObjectHighlightManager,
   createRoland3DModel,
   createRoland808Model,
   disableCameraControlsUponDrag,
@@ -41,10 +40,6 @@ export const createAppModel = () => {
   const dragManager = createDragManager({ intersectionsManager });
   const clickManager = createClickManager({ intersectionsManager });
   const controlsModel = createControlsModel();
-  const highlightManager = createObjectHighlightManager({
-    intersectionsManager,
-    dragManager,
-  });
   const composer = createRoland808Model({});
   const $isLoadingAssets = combine(
     model.isLoaded,
@@ -76,13 +71,14 @@ export const createAppModel = () => {
 
   const uiModel = createUIModel();
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const fxExport = createEffect(async (_: void) => {
     const snapshot = await composer.snapshot.make();
     const blob = new Blob([JSON.stringify(snapshot)], {
       type: "application/json",
     });
     const pickerOptions = {
-      suggestedName: `Untitled.json`,
+      suggestedName: "Untitled.json",
       types: [
         {
           description: "JSON File",
@@ -224,6 +220,7 @@ export const createAppModel = () => {
     from: fxResolveControls.doneData,
     to: [
       intersectionsManager.setIntersectable.prepend(
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         ({ hull, padsLights, aLight, bLight, ...intersectableControls }) =>
           gatherObjects(intersectableControls),
       ),

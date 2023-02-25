@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { AppModel } from "~/features/AppModel";
 import { parseMenuSchema } from "./parseMenuSchema";
 

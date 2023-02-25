@@ -1,7 +1,6 @@
 import { attach, combine, createEvent, createStore } from "effector";
 import { Sampler } from "tone";
 
-const KNOBS_POSITIONS_COUNT = 5;
 const KNOB_POSITIONS = ["00", "10", "25", "50", "75"];
 /**
  * Somehow, there is no C note in Tone.js
@@ -156,35 +155,3 @@ export const createNotesMap = (urlMap: Record<string, string>) => {
 
   return { noteToUrl, sampleToNote };
 };
-
-/**
- * Generates all combination of given Array or number
- *
- * @param {Array | number} items  - Item accepts array or number. If it is array exports all combination of items. If it is a number export all combination of the number
- * @param {number} n - pow of the item, if given value is `n` it will be export max `n` item combination
- *
- * @return {Array} Array of combination arrays.
- * @see https://stackoverflow.com/a/65535210
- */
-function combinate<T>(items: T[], n: number) {
-  const filter = typeof n !== "undefined";
-  n = n ? n : items.length;
-  const result = [] as T[][];
-  const isArray = items.constructor.name === "Array";
-  const count = isArray ? items.length : items;
-
-  // @ts-ignore
-  const pow = (x, n, m = []) => {
-    if (n > 0) {
-      for (var i = 0; i < count; i++) {
-        // @ts-ignore
-        const value = pow(x, n - 1, [...m, isArray ? items[i] : i]);
-        result.push(value);
-      }
-    }
-    return m;
-  };
-  pow(isArray ? items.length : items, n);
-
-  return filter ? result.filter((item) => item.length == n) : result;
-}

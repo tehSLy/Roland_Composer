@@ -169,7 +169,7 @@ export const createRoland808Model = (config?: {
     $currentPattern,
     (composition, instrument, ab, part, pattern) => {
       const seq = composition.patterns[pattern][ab]?.[part]?.[instrument];
-      return seq || Array.from({ length: 16 }).map((_, k) => 0);
+      return seq || Array.from({ length: 16 }).map(() => 0);
     },
   );
 
@@ -337,7 +337,7 @@ export const createRoland808Model = (config?: {
   };
 
   const fxMakeSnapshot = attach({
-    effect: (params: ComposerSnapshot, _: void) => params,
+    effect: (params: ComposerSnapshot) => params,
     source: snapShotMap,
   });
 
@@ -353,7 +353,7 @@ export const createRoland808Model = (config?: {
   $composition
     .on(padToggled, (composition, { ab, instrument, pad, part, pattern }) => {
       const clone = deepClone(composition);
-      //fast inverse
+      // ^= is for fast inverse
       clone.patterns[pattern][ab]![part]![instrument][pad] ^= 1;
       return clone;
     })

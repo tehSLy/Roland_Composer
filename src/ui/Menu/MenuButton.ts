@@ -5,7 +5,6 @@ import { basicTextStyle } from "../shared/styles/basicTextStyle";
 
 export const MenuButton = ({
   text,
-  fn,
   disabled,
 }: {
   text: StoreOrData<string>;

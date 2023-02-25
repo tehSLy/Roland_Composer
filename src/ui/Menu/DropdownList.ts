@@ -3,8 +3,6 @@ import { createStore, is } from "effector";
 import { h, StoreOrData } from "forest";
 import { MenuCommand } from "./MenuCommand";
 
-export const DropdownList = () => {};
-
 export const StaticDropdownList = ({
   children,
   visible,

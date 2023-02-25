@@ -80,6 +80,7 @@ export const createInstrumentsSet = () => {
   };
 
   const fxPollLoading = createEffect(() => {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { accent, ...instrumentsMap } = instruments;
     for (const key in instrumentsMap) {
       if (loaded[key]) {

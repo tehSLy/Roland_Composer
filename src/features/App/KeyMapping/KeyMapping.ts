@@ -4,10 +4,6 @@ import { h, StoreOrData } from "forest";
 import { basicTextStyle } from "../../../ui/shared/styles/basicTextStyle";
 import { keymapping, resolveActionLabel, resolveKeyLabel } from "../../shared";
 
-const SpecialChars = ["PLUS_SIGN"] as const;
-type SpecialChar = (typeof SpecialChars)[number];
-const specialChar = (v: SpecialChar) => v;
-
 export const KeyMapping = ({ visible }: { visible: Store<boolean> }) => {
   h("div", {
     visible,

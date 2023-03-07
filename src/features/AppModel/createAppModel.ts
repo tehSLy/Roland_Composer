@@ -47,16 +47,13 @@ export const createAppModel = () => {
     (...assets) => assets.some((v) => !v),
   );
 
-  const fxShare = attach({
-    source: { snapshot: composer.snapshot.state, name: $projectName },
-    effect({ name, snapshot }) {
+  const fxGetShareUrl = attach({
+    source: { snapshot: composer.snapshot.state },
+    effect({ snapshot }) {
       const encodedSnapshot = encodeURIComponent(
         btoa(JSON.stringify(snapshot)),
       );
-      navigator.share({
-        url: `${location.origin}?snapshot=${encodedSnapshot}`,
-        title: `My Roland TR-808 Composition: ${name}`,
-      });
+      return `${location.origin}?snapshot=${encodedSnapshot}`;
     },
   });
 
@@ -255,7 +252,7 @@ export const createAppModel = () => {
     uiModel,
     export: fxExport,
     import: fxImport,
-    share: fxShare,
+    getShareUrl: fxGetShareUrl,
     projectName: $projectName,
     savedProjects: {
       list: $savedProjects,

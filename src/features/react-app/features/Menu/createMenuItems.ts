@@ -8,7 +8,7 @@ const filePickerApiAvailable =
 export const createMenuItems = (appModel: AppModel) =>
   parseMenuSchema([
     {
-      label: "Menu",
+      label: "File",
       children: [
         {
           label: "Save...",
@@ -50,7 +50,7 @@ export const createMenuItems = (appModel: AppModel) =>
           label: "Share...",
           type: "button",
           meta: {
-            handler: appModel.share,
+            handler: appModel.uiModel.shareModal.open,
           },
         },
       ],

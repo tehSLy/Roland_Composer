@@ -7,6 +7,7 @@ import { KeyMapping } from "~features/KeyMapping";
 import { LoadingIndicator } from "~shared/ui/LoadingIndicator";
 import { SaveModal } from "../features/SaveLoad/ui/SaveModal";
 import { LoadModal } from "../features/SaveLoad/ui/LoadModal";
+import { ShareModal } from "../features/Share/ui/ShareModal";
 
 type AppProps = {
   appModel: AppModel;
@@ -31,6 +32,7 @@ export const App = ({ appModel }: AppProps) => {
       <AppBar appModel={appModel} />
       <SaveModal appModel={appModel} />
       <LoadModal appModel={appModel} />
+      <ShareModal appModel={appModel} />
       <div ref={sceneElementRef}></div>
     </>
   );

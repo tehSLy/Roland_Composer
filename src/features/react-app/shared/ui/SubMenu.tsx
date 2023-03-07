@@ -1,6 +1,6 @@
 import { Store } from "effector";
 import { KeyAction } from "~/features/shared";
-import { MenuItem } from "../../features/Menu/types";
+import { MenuItem } from "../../features/Menu/libs/types";
 import { ButtonMenuItem } from "./ButtonMenuItem";
 import { LinkMenuItem } from "./LinkMenuItem";
 import { NumericMenuItem } from "./NumericMenuItem";

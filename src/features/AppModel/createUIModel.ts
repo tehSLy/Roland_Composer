@@ -17,6 +17,7 @@ export const createUIModel = () => {
   const aboutModal = createModalModel({});
   const saveModal = createModalModel({});
   const loadModal = createModalModel({});
+  const shareModal = createModalModel({});
 
   const $isModalOpened = combine(
     [aboutModal.isOpen, saveModal.isOpen, loadModal.isOpen],
@@ -31,6 +32,7 @@ export const createUIModel = () => {
     aboutModal,
     saveModal,
     loadModal,
+    shareModal,
     isModalOpened: $isModalOpened,
   };
 };

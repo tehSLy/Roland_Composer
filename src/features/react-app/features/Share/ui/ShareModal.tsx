@@ -4,7 +4,7 @@ import { useMemo } from "react";
 import { AppModel } from "~/features/AppModel";
 import { Input } from "~/features/react-app/shared/ui/Input";
 import { Modal } from "~/features/react-app/shared/ui/Modal";
-import { createShareButtons } from "../libs/createButtons";
+import { createShareButtons } from "../createButtons";
 import { $shareInputValue } from "../model";
 
 type ShareModalProps = {
@@ -14,10 +14,7 @@ type ShareModalProps = {
 export const ShareModal = ({ appModel }: ShareModalProps) => {
   const shareInputValue = useStore($shareInputValue);
 
-  const shareModalButtons = useMemo(
-    () => createShareButtons(appModel),
-    [appModel],
-  );
+  const shareModalButtons = useMemo(() => createShareButtons(), []);
 
   return (
     <Modal
@@ -26,6 +23,7 @@ export const ShareModal = ({ appModel }: ShareModalProps) => {
       body={
         <Input
           readOnly
+          autoFocus
           onClick={(evt) => evt.currentTarget.select()}
           value={shareInputValue}
         />

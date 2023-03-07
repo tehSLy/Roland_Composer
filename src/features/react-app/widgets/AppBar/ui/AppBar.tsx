@@ -1,7 +1,7 @@
 import { useMemo } from "react";
 import { AppModel } from "~/features/AppModel";
 import { Menu } from "~features/Menu";
-import { createMenuItems } from "~features/Menu/libs/createMenuItems";
+import { createMenuItems } from "~/features/react-app/features/Menu/createMenuItems";
 import { ProjectName } from "~entities/project/ui/ProjectName";
 import tw from "tailwind-styled-components";
 

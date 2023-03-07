@@ -2,7 +2,7 @@ import { useMemo } from "react";
 import { AppModel } from "~/features/AppModel";
 import { ProjectsList } from "~entities/project/ui/ProjectsList";
 import { Modal } from "~shared/ui/Modal";
-import { createSaveButtons } from "../libs/createButtons";
+import { createSaveButtons } from "../createButtons";
 import { savedProjectslistModel } from "~/model";
 
 type SaveModalProps = {

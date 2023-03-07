@@ -5,7 +5,7 @@ import tw from "tailwind-styled-components";
 type ButtonProps = {
   title: Store<string>;
   disabled: Store<boolean>;
-  onClick?: React.MouseEventHandler<HTMLButtonElement>;
+  onClick: React.MouseEventHandler<HTMLButtonElement>;
 };
 
 export const Button = ({

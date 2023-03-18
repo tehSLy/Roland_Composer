@@ -62,6 +62,8 @@ export const createMenuItems = (appModel: AppModel) =>
           label: "Set BPM",
           type: "number",
           meta: {
+            from: 65,
+            to: 215,
             value: appModel.deviceModel._bpm.position,
             handler: appModel.deviceModel._bpm.setPosition,
           },

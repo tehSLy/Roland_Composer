@@ -7,12 +7,14 @@ type NumericMenuItemProps = {
   title: Store<string>;
   value: Store<number>;
   onChange?: React.ChangeEventHandler<HTMLInputElement>;
+  onBlur?: React.FocusEventHandler<HTMLInputElement>;
 };
 
 export const NumericMenuItem = ({
   title: $title,
   value: $value,
   onChange,
+  onBlur,
 }: NumericMenuItemProps) => {
   const value = useStore($value);
   const title = useStore($title);
@@ -20,7 +22,13 @@ export const NumericMenuItem = ({
   return (
     <MenuItemWrapper>
       <span>{title}</span>
-      <Input value={value} onChange={onChange} className="text-right" />
+      <Input
+        value={value}
+        onBlur={onBlur}
+        onChange={onChange}
+        type="number"
+        className="text-right"
+      />
     </MenuItemWrapper>
   );
 };

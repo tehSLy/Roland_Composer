@@ -1,4 +1,5 @@
 import { Store } from "effector";
+import { clamp, inRange } from "lodash";
 import { KeyAction } from "~/features/shared";
 import { MenuItem } from "../../features/Menu/types";
 import { ButtonMenuItem } from "./ButtonMenuItem";
@@ -37,9 +38,26 @@ export const SubMenu = ({ items }: SubMenuProps) => {
               <NumericMenuItem
                 title={label as Store<string>}
                 value={meta.value as Store<number>}
-                onChange={(event) =>
-                  meta.handler(Number(event.currentTarget.value))
-                }
+                onBlur={(event) => {
+                  if (
+                    !inRange(
+                      event.currentTarget.valueAsNumber,
+                      meta.from!,
+                      meta.to,
+                    )
+                  ) {
+                    meta.handler(
+                      clamp(
+                        event.currentTarget.valueAsNumber,
+                        meta.from!,
+                        meta.to!,
+                      ),
+                    );
+                  }
+                }}
+                onChange={(event) => {
+                  meta.handler(event.currentTarget.valueAsNumber);
+                }}
               />
             );
           }
